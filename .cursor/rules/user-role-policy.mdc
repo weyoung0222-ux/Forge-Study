@@ -1,0 +1,24 @@
+---
+description: Apply shared user role policy consistently
+alwaysApply: true
+---
+
+# User Role Policy Rule
+
+Always follow `docs/policies/user-role-policy.md` when implementing or modifying role-related UI and behavior.
+
+## Must Follow
+- Use shared role naming:
+  - `consumer`, `dev`, `supporter`, `admin`
+  - Dev sub-roles: `project owner`, `data engineer`, `model engineer`
+- Support multiple Dev sub-roles for one user.
+- Keep role meaning aligned with policy scope:
+  - project owner -> project management
+  - data engineer -> Data Foundry features
+  - model engineer -> Model Institute features
+
+## Sync Requirement
+- If role behavior or labels change, update:
+  - implementation files
+  - `Catalog` descriptions if impacted
+  - `docs/policies/user-role-policy.md`

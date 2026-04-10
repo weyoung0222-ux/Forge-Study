@@ -1,0 +1,10 @@
+{
+  "screens": [
+    {
+      "screenId": "customersList",
+      "figmaFileKey": "REPLACE_ME",
+      "figmaNodeId": "REPLACE_ME",
+      "notes": "Connect after design finalization"
+    }
+  ]
+}

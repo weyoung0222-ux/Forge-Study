@@ -1,0 +1,23 @@
+---
+description: Keep unified Catalog units consistent
+alwaysApply: true
+---
+
+# Catalog Unit Governance Rule
+
+When changing reusable UI units, maintain the unified `Catalog` menu and previews.
+
+## Must Follow
+- Use `src/descriptions/unitDefinitions.ts` as the single source of truth.
+- Keep unit taxonomy in `Catalog`: `components`, `blocks`, `pageTypes`.
+- Show only items where `renderable === true` and `usedInPrototype === true`.
+- If a unit cannot be rendered yet, do not expose it in the menu.
+
+## Required Updates In Same Task
+- Update unit metadata in `src/descriptions/unitDefinitions.ts`.
+- Update preview rendering in `src/pages/catalog/Catalog/Catalog.page.tsx`.
+- Keep `/descriptions` redirected to `/catalog` (no split maintenance).
+
+## Validation
+- Tabs and search in `Catalog` remain functional.
+- No conceptual-only entries shown without renderable UI.

@@ -1,0 +1,21 @@
+---
+description: Enforce source/activity naming and chip usage
+alwaysApply: true
+---
+
+# Source Policy Rule
+
+Follow `docs/policies/source-policy.md` for all Source-related UI and data.
+
+## Must Follow
+- Treat `Source` as the activity that produced an output.
+- Use only approved activity keys:
+  - `register`, `collector`, `generator`, `curator`, `trainer`, `evaluator`
+- Render Source as chip/badge style in UI wherever practical.
+- Do not leave `{Source}` placeholders in implemented screens.
+
+## Sync Requirement
+- If activities or labels change, update:
+  - policy doc
+  - schema/mock types and options
+  - catalog previews/descriptions using Source values

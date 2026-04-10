@@ -1,0 +1,43 @@
+---
+description: Enforce reusable pattern/block workflow for all screens
+alwaysApply: true
+---
+
+# UI Pattern Governance
+
+When creating or modifying screens in this project, follow these rules:
+
+1. Build screens using existing patterns and blocks first.
+2. If a UI cannot be implemented with existing patterns, create a reusable block.
+3. When a pattern is created or changed:
+   - Inform the user what changed.
+   - Update `catalog` to reflect the change.
+   - Apply the same change to all components/screens using that pattern.
+4. New patterns and blocks must be reusable (generic props, no screen-specific hardcoding).
+5. Global navigation must be centralized:
+   - Use `src/navigation/globalTopNav.tsx` for brand icon, menu items, and top-right actions.
+   - Do not redefine GNB menus/actions per screen.
+6. Temporary `Description` button behavior must be consistent:
+   - Open right-side in-screen description panel (do not navigate away).
+   - Use reusable panel block and screen-specific `*.ux.ts` data.
+
+## Required Workflow
+
+- Before implementation:
+  - Check `src/blocks/registry/blockRegistry.ts` and `src/blocks/registry/patternRegistry.ts`.
+  - Reuse existing entries if possible.
+- During implementation:
+  - Keep block logic in `src/blocks/*`.
+  - Keep pattern composition in `src/patterns/*`.
+  - Keep screen-specific wiring in `src/screens/*`.
+  - Reuse centralized GNB config from `src/navigation/globalTopNav.tsx`.
+  - Keep `Description (Temp)` to side-panel behavior for all screens using GNB.
+- After implementation:
+  - Sync registry entries for added/changed blocks/patterns.
+  - Sync catalog previews/routes when relevant (`src/pages/catalog/Catalog/Catalog.page.tsx`).
+  - Mention impacted screens/components in the response.
+
+## Examples
+
+- Bad: hardcode a one-off UI directly inside `*.screen.tsx` when same shape appears elsewhere.
+- Good: extract reusable block in `src/blocks`, then compose via `src/patterns`.
