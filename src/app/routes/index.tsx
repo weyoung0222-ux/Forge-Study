@@ -29,6 +29,7 @@ export function AppRouter(): JSX.Element {
         <Route path="/projects/new" element={<ProjectCreatePage />} />
         <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
         <Route path="/projects/:projectId/workspace" element={<ProjectWorkspacePage />} />
+        <Route path="/projects/:projectId/workspace/:workKey" element={<ProjectWorkspacePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

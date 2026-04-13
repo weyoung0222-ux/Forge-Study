@@ -177,8 +177,8 @@ export const blockUnitItems: DescriptionUnitItem[] = [
   {
     id: 'desc-rfm.workPageShell',
     title: '워크페이지 풀사이즈 셸 (WorkPageShellBlock)',
-    summary: '헤더/스텝바/컨텐츠 영역을 포함한 full-size popup work page 공통 셸',
-    bullets: ['우측 History 버튼 제공', '각 work 버튼 클릭 시 템플릿 변형과 함께 오픈'],
+    summary: '헤더/스텝바/컨텐츠 영역을 포함한 full-size work page 공통 셸',
+    bullets: ['우측 History 버튼 제공', 'activity 경로 전환(/workspace/:workKey) 시 템플릿 변형과 함께 렌더링'],
     codePath: 'src/blocks/organisms/WorkPageShell.block.tsx',
     renderable: true,
     usedInPrototype: true,
@@ -318,8 +318,8 @@ export const screenPatternUnitItems: DescriptionUnitItem[] = [
   {
     id: 'page.work',
     title: 'Work Page',
-    summary: '각 work 활동 버튼을 통해 열리는 full-size popup 실행 화면 패턴',
-    bullets: ['대표 진입: Workspace 내 activity card 클릭', '공통 헤더 + 스텝바 + 템플릿 캔버스 구조'],
+    summary: '각 work 활동 버튼 클릭 후 URL 전환으로 진입하는 full-size 실행 화면 패턴',
+    bullets: ['대표 경로: /projects/:projectId/workspace/:workKey', '공통 헤더 + 스텝바 + 템플릿 캔버스 구조'],
     codePath: 'src/blocks/organisms/WorkPageShell.block.tsx',
     renderable: true,
     usedInPrototype: true,

@@ -30,6 +30,7 @@ import { projectWorkspaceUxDescription } from './ProjectWorkspace.ux';
 
 type Props = {
   projectId: string;
+  workKey?: string;
   onNavigate: (path: string) => void;
 };
 
@@ -54,6 +55,13 @@ type WorkspaceDatasetRow = {
 };
 type WorkspaceActivityKey = 'register' | 'collector' | 'generator' | 'curator' | 'trainer' | 'evaluator';
 
+const workspaceActivityKeys: WorkspaceActivityKey[] = ['register', 'collector', 'generator', 'curator', 'trainer', 'evaluator'];
+
+function isWorkspaceActivityKey(value: string | undefined): value is WorkspaceActivityKey {
+  if (!value) return false;
+  return workspaceActivityKeys.includes(value as WorkspaceActivityKey);
+}
+
 const sourceOptions: Array<{ value: LibrarySource; label: string }> = [
   { value: 'all', label: 'Source : All' },
   { value: 'register', label: 'Source : Register' },
@@ -75,12 +83,11 @@ const workspaceTableColumns: DataTableColumn[] = [
   { key: 'action', label: 'Action', align: 'center' },
 ];
 
-export function ProjectWorkspaceScreen({ projectId, onNavigate }: Props): JSX.Element {
+export function ProjectWorkspaceScreen({ projectId, workKey, onNavigate }: Props): JSX.Element {
   const [isUxOpen, setIsUxOpen] = React.useState(false);
   const [highlightedKey, setHighlightedKey] = React.useState<HighlightKey | null>(null);
   const [isProjectSelectorOpen, setIsProjectSelectorOpen] = React.useState(false);
   const [projectSearch, setProjectSearch] = React.useState('');
-  const [activeWorkPageActivity, setActiveWorkPageActivity] = React.useState<WorkspaceActivityKey | null>(null);
   const [selectedProjectId, setSelectedProjectId] = React.useState<string>('PJT-002');
   const [pendingProjectId, setPendingProjectId] = React.useState<string | null>('PJT-002');
   const [workspaceTab, setWorkspaceTab] = React.useState<WorkspaceTab>('dataFoundry');
@@ -130,6 +137,7 @@ export function ProjectWorkspaceScreen({ projectId, onNavigate }: Props): JSX.El
     trainer: { title: 'Model Train', variant: 'type4-save-deploy' },
     evaluator: { title: 'Model Evaluate', variant: 'type3-validation-progress' },
   };
+  const activeWorkPageActivity = isWorkspaceActivityKey(workKey) ? workKey : null;
 
   const datasetRows: WorkspaceDatasetRow[] = Array.from({ length: 50 }, (_, index) => {
     const sourceKeys: LibrarySource[] = ['register', 'collector', 'generator', 'curator', 'trainer', 'evaluator'];
@@ -271,7 +279,8 @@ export function ProjectWorkspaceScreen({ projectId, onNavigate }: Props): JSX.El
                   <ProjectWorkspaceActivityCardsBlock
                     items={activityItems}
                     onClickActivity={(activity) => {
-                      setActiveWorkPageActivity(activity as WorkspaceActivityKey);
+                      const nextWorkKey = activity as WorkspaceActivityKey;
+                      onNavigate(`/projects/${selectedProjectId}/workspace/${nextWorkKey}`);
                     }}
                   />
                 </div>
@@ -348,7 +357,7 @@ export function ProjectWorkspaceScreen({ projectId, onNavigate }: Props): JSX.El
         isOpen={activeWorkPageActivity !== null}
         title={activeWorkPageActivity ? workPageConfigMap[activeWorkPageActivity].title : 'Work Page'}
         variant={activeWorkPageActivity ? workPageConfigMap[activeWorkPageActivity].variant : 'type1-parameter-preview'}
-        onClose={() => setActiveWorkPageActivity(null)}
+        onClose={() => onNavigate(`/projects/${selectedProjectId}/workspace`)}
         onHistoryClick={() => {
           window.alert('History panel will be connected in next step.');
         }}

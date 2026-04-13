@@ -46,8 +46,8 @@ export function GlobalTopNavBlock({
 
   return (
     <>
-      <header className="h-14 border-b border-slate-200 bg-white px-5">
-        <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between">
+      <header className="h-14 border-b border-slate-200 bg-white">
+        <div className="flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-10">
             <button type="button" onClick={onBrandClick} className="flex items-center gap-2 bg-transparent">
               {brandIcon ? <span className="text-slate-900">{brandIcon}</span> : null}

@@ -559,7 +559,7 @@ export function CatalogPage(): JSX.Element {
     'page.list': '/projects',
     'page.detail': '/projects/sample-project',
     'page.workspace': '/projects/pjt-002/workspace',
-    'page.work': '/projects/pjt-002/workspace',
+    'page.work': '/projects/pjt-002/workspace/register',
     'page.form': '/',
   };
 

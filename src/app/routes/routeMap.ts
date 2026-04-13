@@ -6,7 +6,7 @@ import { libraryRoute } from '../../pages/library/Library/Library.route';
 import { projectCreateRoute } from '../../pages/projects/ProjectCreate/ProjectCreate.route';
 import { projectDetailRoute } from '../../pages/projects/ProjectDetail/ProjectDetail.route';
 import { projectListRoute } from '../../pages/projects/ProjectList/ProjectList.route';
-import { projectWorkspaceRoute } from '../../pages/projects/ProjectWorkspace/ProjectWorkspace.route';
+import { projectWorkPageRoute, projectWorkspaceRoute } from '../../pages/projects/ProjectWorkspace/ProjectWorkspace.route';
 import { workspaceHomeRoute } from '../../pages/workspace/WorkspaceHome/WorkspaceHome.route';
 
 export type AppRoute = {
@@ -34,4 +34,5 @@ export const appRoutes: AppRoute[] = [
   projectCreateRoute,
   projectDetailRoute,
   projectWorkspaceRoute,
+  projectWorkPageRoute,
 ];

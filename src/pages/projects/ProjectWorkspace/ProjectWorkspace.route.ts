@@ -7,3 +7,11 @@ export const projectWorkspaceRoute: AppRoute = {
   description: 'Project workspace view',
   hidden: true,
 };
+
+export const projectWorkPageRoute: AppRoute = {
+  key: 'projectWorkPage',
+  path: '/projects/:projectId/workspace/:workKey',
+  title: 'Project Work Page',
+  description: 'Project work page view',
+  hidden: true,
+};

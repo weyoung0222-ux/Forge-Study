@@ -261,7 +261,7 @@ export const blockRegistry: BlockMeta[] = [
     version: '1.0.0',
     owner: 'product-design-system',
     category: 'organism',
-    description: 'Full-size popup shell for work page with header and steps',
-    tags: ['workpage', 'overlay', 'popup'],
+    description: 'Full-size routed shell for work page with header and steps',
+    tags: ['workpage', 'route', 'fullsize'],
   },
 ];
