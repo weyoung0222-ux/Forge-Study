@@ -10,6 +10,7 @@ import { ProjectSelectorPanelBlock } from '../../../blocks/organisms/ProjectSele
 import { ProjectTaskListBlock } from '../../../blocks/organisms/ProjectTaskList.block';
 import { ProjectWorkspaceSidebarBlock, type ProjectMemberRole } from '../../../blocks/organisms/ProjectWorkspaceSidebar.block';
 import { ScreenDescriptionPanelBlock } from '../../../blocks/organisms/ScreenDescriptionPanel.block';
+import { projectSelectorRows } from '../../../data-spec/mocks/projectSelector.mock';
 import {
   createGlobalTopNavItems,
   createTemporaryTopUtilityButtons,
@@ -31,77 +32,18 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
   const [isLayoutMenuOpen, setIsLayoutMenuOpen] = React.useState(false);
   const [isProjectSelectorOpen, setIsProjectSelectorOpen] = React.useState(false);
   const [projectSearch, setProjectSearch] = React.useState('');
-  const [selectedProjectId, setSelectedProjectId] = React.useState<string>('pjt-002');
-  const [pendingProjectId, setPendingProjectId] = React.useState<string | null>('pjt-002');
+  const [selectedProjectId, setSelectedProjectId] = React.useState<string>('PJT-002');
+  const [pendingProjectId, setPendingProjectId] = React.useState<string | null>('PJT-002');
 
   const navItems = createGlobalTopNavItems('projects', onNavigate);
   const utilityButtons = createTemporaryTopUtilityButtons(() => setIsUxOpen(true), () => onNavigate('/'));
-  const projectOptions: Array<ProjectSelectorCardItem & { nickname: string; roles: ProjectMemberRole[] }> = [
-    {
-      id: 'pjt-001',
-      name: 'Project 1',
-      applicableModel: 'GROOT N1.5',
-      fineTuningModels: '8 Models',
-      relatedDatasets: '1,248 Datasets',
-      imageLabel: 'robot',
-      nickname: 'Alex',
-      roles: ['project owner'],
-    },
-    {
-      id: 'pjt-002',
-      name: 'Project 2',
-      applicableModel: 'GROOT N1.5',
-      fineTuningModels: '8 Models',
-      relatedDatasets: '1,248 Datasets',
-      imageLabel: 'human',
-      nickname: 'Mina',
-      roles: ['data engineer'],
-    },
-    {
-      id: 'pjt-003',
-      name: 'Project 3',
-      applicableModel: 'GROOT N1.5',
-      fineTuningModels: '8 Models',
-      relatedDatasets: '1,248 Datasets',
-      imageLabel: 'robot',
-      nickname: 'Jay',
-      roles: ['model engineer'],
-    },
-    {
-      id: 'pjt-004',
-      name: 'Project 4',
-      applicableModel: 'GROOT N1.5',
-      fineTuningModels: '8 Models',
-      relatedDatasets: '1,248 Datasets',
-      imageLabel: 'robot',
-      nickname: 'Rina',
-      roles: ['project owner', 'data engineer'],
-    },
-    {
-      id: 'pjt-005',
-      name: 'Project 5',
-      applicableModel: 'GROOT N1.5',
-      fineTuningModels: '8 Models',
-      relatedDatasets: '1,248 Datasets',
-      imageLabel: 'robot',
-      nickname: 'Leo',
-      roles: ['data engineer', 'model engineer'],
-    },
-    {
-      id: 'pjt-006',
-      name: 'Project 6',
-      applicableModel: 'GROOT N1.5',
-      fineTuningModels: '8 Models',
-      relatedDatasets: '1,248 Datasets',
-      imageLabel: 'robot',
-      nickname: 'Chris',
-      roles: ['project owner', 'data engineer', 'model engineer'],
-    },
-  ];
+  const projectOptions: Array<ProjectSelectorCardItem & { nickname: string; roles: ProjectMemberRole[] }> = projectSelectorRows;
   React.useEffect(() => {
-    const resolvedId = projectOptions.some((item) => item.id === projectId) ? projectId : 'pjt-002';
-    setSelectedProjectId(resolvedId);
-    setPendingProjectId(resolvedId);
+    const resolved =
+      projectOptions.find((item) => item.id.toLowerCase() === projectId.toLowerCase()) ?? projectOptions.find((item) => item.id === 'PJT-002');
+    if (!resolved) return;
+    setSelectedProjectId(resolved.id);
+    setPendingProjectId(resolved.id);
   }, [projectId]);
 
   const filteredProjectOptions = projectOptions.filter((item) => item.name.toLowerCase().includes(projectSearch.trim().toLowerCase()));
@@ -156,8 +98,8 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
                   setIsProjectSelectorOpen(true);
                 }}
                 items={[
-                  { key: 'dashboard', label: 'Dashboard', active: true },
-                  { key: 'workspace', label: 'Workspace' },
+                  { key: 'dashboard', label: 'Dashboard', active: true, onClick: () => onNavigate(`/projects/${selectedProjectId}`) },
+                  { key: 'workspace', label: 'Workspace', onClick: () => onNavigate(`/projects/${selectedProjectId}/workspace`) },
                   { key: 'settings', label: 'Settings' },
                 ]}
                 profileName={currentProject.nickname}
@@ -167,38 +109,36 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
 
             <section className="space-y-4">
               <div className={highlightClass('header')}>
-                <div className="rounded-lg border border-slate-200 bg-white px-4 py-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h1 className="text-3xl font-semibold text-slate-900">{activeProjectTitle}</h1>
-                      <p className="mt-1 text-sm text-slate-600">{'{Project description}'}</p>
-                    </div>
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setIsLayoutMenuOpen((prev) => !prev)}
-                        className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 hover:bg-slate-50"
-                      >
-                        Edit Layout
-                      </button>
-                      {isLayoutMenuOpen ? (
-                        <div className="absolute right-0 top-8 z-10 w-32 rounded-md border border-slate-200 bg-white p-1 shadow">
-                          <button className="block w-full rounded px-2 py-1.5 text-left text-xs text-slate-700 hover:bg-slate-50">Edit Layout</button>
-                          <button className="block w-full rounded px-2 py-1.5 text-left text-xs text-slate-700 hover:bg-slate-50">Reset Layout</button>
-                        </div>
-                      ) : null}
-                    </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h1 className="text-3xl font-semibold text-slate-900">{activeProjectTitle}</h1>
+                    <p className="mt-1 text-sm text-slate-600">{'{Project description}'}</p>
                   </div>
-                  <div className="mt-3">
-                    <ProjectMetaInfoStripBlock
-                      items={[
-                        { label: 'Task', value: 'Manipulation / Pick-and-Place' },
-                        { label: 'Robot', value: 'Dexmate Vega' },
-                        { label: 'Started Date', value: 'Apr 15, 2026' },
-                        { label: 'Owner', value: 'Robotics Team Alpha' },
-                      ]}
-                    />
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsLayoutMenuOpen((prev) => !prev)}
+                      className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 hover:bg-slate-50"
+                    >
+                      Edit Layout
+                    </button>
+                    {isLayoutMenuOpen ? (
+                      <div className="absolute right-0 top-8 z-10 w-32 rounded-md border border-slate-200 bg-white p-1 shadow">
+                        <button className="block w-full rounded px-2 py-1.5 text-left text-xs text-slate-700 hover:bg-slate-50">Edit Layout</button>
+                        <button className="block w-full rounded px-2 py-1.5 text-left text-xs text-slate-700 hover:bg-slate-50">Reset Layout</button>
+                      </div>
+                    ) : null}
                   </div>
+                </div>
+                <div className="mt-3">
+                  <ProjectMetaInfoStripBlock
+                    items={[
+                      { label: 'Task', value: 'Manipulation / Pick-and-Place' },
+                      { label: 'Robot', value: 'Dexmate Vega' },
+                      { label: 'Started Date', value: 'Apr 15, 2026' },
+                      { label: 'Owner', value: 'Robotics Team Alpha' },
+                    ]}
+                  />
                 </div>
               </div>
 

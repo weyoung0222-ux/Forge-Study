@@ -57,6 +57,12 @@ export function LoginPage(): JSX.Element {
               >
                 Catalog
               </Link>
+              <Link
+                to="/flow"
+                className="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-xs text-slate-700 hover:bg-slate-50"
+              >
+                Screen Flow
+              </Link>
             </div>
           </div>
         </div>

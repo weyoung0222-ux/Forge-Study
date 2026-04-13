@@ -5,8 +5,11 @@ import { GlobalTopNavBlock } from '../../../blocks/molecules/GlobalTopNav.block'
 import { ListHeaderBlock } from '../../../blocks/molecules/ListHeader.block';
 import { OverlayDialogBlock } from '../../../blocks/molecules/OverlayDialog.block';
 import { ProjectMetaInfoStripBlock } from '../../../blocks/molecules/ProjectMetaInfoStrip.block';
+import { SectionTitleBlock } from '../../../blocks/molecules/SectionTitle.block';
 import { ListStatusTabsBlock } from '../../../blocks/molecules/ListStatusTabs.block';
+import { TablePaginationBlock } from '../../../blocks/molecules/TablePagination.block';
 import { ViewModeToggleBlock, type ViewMode } from '../../../blocks/molecules/ViewModeToggle.block';
+import { DataTableBlock } from '../../../blocks/organisms/DataTable.block';
 import { LibraryAssetGridBlock } from '../../../blocks/organisms/LibraryAssetGrid.block';
 import { ListToolbarBlock } from '../../../blocks/organisms/ListToolbar.block';
 import { ProjectInfoListPanelBlock } from '../../../blocks/organisms/ProjectInfoListPanel.block';
@@ -16,7 +19,12 @@ import { ProjectSelectorCardBlock } from '../../../blocks/organisms/ProjectSelec
 import { ProjectSelectorPanelBlock } from '../../../blocks/organisms/ProjectSelectorPanel.block';
 import { ProjectTaskListBlock } from '../../../blocks/organisms/ProjectTaskList.block';
 import { ProjectCardGridBlock } from '../../../blocks/organisms/ProjectCardGrid.block';
+import { ProjectJobsOnProcessDrawerBlock } from '../../../blocks/organisms/ProjectJobsOnProcessDrawer.block';
+import { WorkPageShellBlock } from '../../../blocks/organisms/WorkPageShell.block';
+import { WorkPageTemplateCanvasBlock } from '../../../blocks/organisms/WorkPageTemplateCanvas.block';
+import { ProjectWorkspaceActivityCardsBlock } from '../../../blocks/organisms/ProjectWorkspaceActivityCards.block';
 import { ProjectWorkspaceSidebarBlock } from '../../../blocks/organisms/ProjectWorkspaceSidebar.block';
+import { WorkspaceItemDetailDrawerBlock } from '../../../blocks/organisms/WorkspaceItemDetailDrawer.block';
 import { libraryAssetRows } from '../../../data-spec/mocks/libraryAssets.mock';
 import { projectListRows } from '../../../data-spec/mocks/projectList.mock';
 import { blockUnitItems, componentUnitItems, overlayUnitItems, screenPatternUnitItems } from '../../../descriptions/unitDefinitions';
@@ -165,6 +173,9 @@ export function CatalogPage(): JSX.Element {
     if (id === 'desc-rfm.listHeader') {
       return <ListHeaderBlock title="Sample Header" subtitle="Block-level preview" primaryAction={{ label: 'Create', onClick: () => {} }} />;
     }
+    if (id === 'desc-rfm.sectionTitle') {
+      return <SectionTitleBlock title="Saved Datasets" count={1248} countLabel="datasets" />;
+    }
     if (id === 'desc-rfm.listToolbar') {
       return (
         <ListToolbarBlock
@@ -185,6 +196,35 @@ export function CatalogPage(): JSX.Element {
     }
     if (id === 'desc-rfm.libraryAssetGrid') {
       return <LibraryAssetGridBlock items={libraryAssetRows.slice(0, 4)} viewMode={sampleViewMode} />;
+    }
+    if (id === 'desc-rfm.dataTable') {
+      return (
+        <DataTableBlock
+          columns={[
+            { key: 'no', label: 'No.', align: 'center' },
+            { key: 'name', label: 'Dataset Name' },
+            { key: 'source', label: 'Source', align: 'center' },
+            { key: 'action', label: 'Action', align: 'center' },
+          ]}
+          rows={[
+            {
+              no: '1',
+              name: 'Warehouse Scenarios Collection',
+              source: <span className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px]">Generator</span>,
+              action: <button className="rounded border border-slate-300 px-2 py-0.5 text-[10px]">Publish</button>,
+            },
+            {
+              no: '2',
+              name: 'Dexmate Motion Dataset',
+              source: <span className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px]">Curator</span>,
+              action: <button className="rounded border border-slate-300 px-2 py-0.5 text-[10px]">Publish</button>,
+            },
+          ]}
+        />
+      );
+    }
+    if (id === 'desc-rfm.tablePagination') {
+      return <TablePaginationBlock currentPage={2} pageSize={10} totalItems={47} onPageChange={() => {}} />;
     }
     if (id === 'desc-rfm.projectWorkspaceSidebar') {
       return (
@@ -225,6 +265,18 @@ export function CatalogPage(): JSX.Element {
               dueDate: 'Due: Apr 15, 2026',
               priority: 'Priority: High',
             },
+          ]}
+        />
+      );
+    }
+    if (id === 'desc-rfm.projectWorkspaceActivityCards') {
+      return (
+        <ProjectWorkspaceActivityCardsBlock
+          items={[
+            { key: 'register', title: 'Register', description: 'Upload existing data to the platform.' },
+            { key: 'collector', title: 'Collect', description: 'Data collection through teleoperation.' },
+            { key: 'generator', title: 'Generate', description: 'Augment and produce datasets.' },
+            { key: 'curator', title: 'Curate', description: 'Merge datasets and create a new data.' },
           ]}
         />
       );
@@ -347,6 +399,98 @@ export function CatalogPage(): JSX.Element {
         />
       );
     }
+    if (id === 'desc-rfm.workspaceItemDetailDrawer') {
+      return (
+        <div className="relative h-56 overflow-hidden rounded-md border border-slate-200 bg-slate-50">
+          <div className="absolute inset-y-0 right-0 w-[70%]">
+            <WorkspaceItemDetailDrawerBlock
+              isOpen
+              previewMode
+              title="진행 중입니다."
+              subtitle="Project description goes here."
+              summary="Warehouse Scenarios Collection - Run #112"
+              source="Generator"
+              overviewItems={[
+                { label: 'No.', value: '1' },
+                { label: 'Dataset Name', value: 'Warehouse Scenarios Collection - Run #112' },
+                { label: 'Project Name', value: 'Project 2' },
+                { label: 'Version', value: 'v1.0' },
+                { label: 'Source', value: 'Generator' },
+                { label: 'Worker', value: 'Wiyoung' },
+              ]}
+              taskDetailSummary={{ total: 500, passed: 150, failed: 150, warned: 150 }}
+              taskDetailRecords={[
+                {
+                  id: 'task-1',
+                  recordId: 'REC-0001',
+                  videoLabel: 'img',
+                  status: 'warn',
+                  contents: "Retrieve all the groceries and store them in the pantry start() takeAndDrop('grocery','pantry') stop...",
+                  validation: 'warn',
+                  duration: '50',
+                },
+                {
+                  id: 'task-2',
+                  recordId: 'REC-0002',
+                  videoLabel: 'img',
+                  status: 'fail',
+                  contents: "Retrieve all the groceries and store them in the pantry start() takeAndDrop('grocery','pantry') stop...",
+                  validation: 'fail',
+                  duration: '50',
+                },
+              ]}
+              onClose={() => {}}
+            />
+          </div>
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.projectJobsOnProcessDrawer') {
+      return (
+        <div className="relative h-56 overflow-hidden rounded-md border border-slate-200 bg-slate-50">
+          <div className="absolute inset-y-0 right-0 w-[72%]">
+            <ProjectJobsOnProcessDrawerBlock
+              isOpen
+              jobs={[
+                {
+                  id: 'job-1',
+                  name: 'Generate synthetic grasp trajectories',
+                  description: 'Domain randomization based dataset generation for gripper policy.',
+                  source: 'generator',
+                  worker: 'Mina',
+                  progress: 72,
+                  status: 'running',
+                  startedAt: '2026-04-13 09:20',
+                  eta: '1h 10m',
+                },
+                {
+                  id: 'job-2',
+                  name: 'Curate warehouse scenario merge',
+                  description: 'Merge run datasets and resolve label conflicts.',
+                  source: 'curator',
+                  worker: 'Alex',
+                  progress: 41,
+                  status: 'running',
+                  startedAt: '2026-04-13 08:50',
+                  eta: '2h 30m',
+                },
+              ]}
+              onClose={() => {}}
+            />
+          </div>
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.workPageTemplateCanvas') {
+      return <WorkPageTemplateCanvasBlock variant="type1-parameter-preview" />;
+    }
+    if (id === 'desc-rfm.workPageShell') {
+      return (
+        <div className="rounded-md border border-slate-200 bg-slate-50 p-2 text-xs text-slate-600">
+          WorkPageShellBlock renders as full-size popup. Open workspace activity cards to see full interaction.
+        </div>
+      );
+    }
     if (id === 'page.list') {
       return (
         <div className="grid gap-2">
@@ -380,6 +524,32 @@ export function CatalogPage(): JSX.Element {
         </div>
       );
     }
+    if (id === 'page.workspace') {
+      return (
+        <div className="grid gap-2">
+          <div className="h-10 rounded-md border border-slate-200 bg-slate-50" />
+          <div className="grid gap-2 md:grid-cols-4">
+            <div className="h-14 rounded-md border border-slate-200 bg-slate-50" />
+            <div className="h-14 rounded-md border border-slate-200 bg-slate-50" />
+            <div className="h-14 rounded-md border border-slate-200 bg-slate-50" />
+            <div className="h-14 rounded-md border border-slate-200 bg-slate-50" />
+          </div>
+          <div className="h-24 rounded-md border border-slate-200 bg-slate-50" />
+        </div>
+      );
+    }
+    if (id === 'page.work') {
+      return (
+        <div className="grid gap-2">
+          <div className="h-10 rounded-md border border-slate-200 bg-slate-50" />
+          <div className="h-8 rounded-md border border-slate-200 bg-slate-50" />
+          <div className="grid gap-2 md:grid-cols-[220px_minmax(0,1fr)]">
+            <div className="h-24 rounded-md border border-slate-200 bg-slate-50" />
+            <div className="h-24 rounded-md border border-slate-200 bg-slate-50" />
+          </div>
+        </div>
+      );
+    }
     return <p className="text-xs text-slate-500">Preview is not defined for this unit yet.</p>;
   };
 
@@ -388,6 +558,8 @@ export function CatalogPage(): JSX.Element {
     'page.dashboard': '/home',
     'page.list': '/projects',
     'page.detail': '/projects/sample-project',
+    'page.workspace': '/projects/pjt-002/workspace',
+    'page.work': '/projects/pjt-002/workspace',
     'page.form': '/',
   };
 

@@ -1,10 +1,12 @@
 import { catalogRoute } from '../../pages/catalog/Catalog/Catalog.route';
 import { loginRoute } from '../../pages/auth/Login/Login.route';
+import { flowRoute } from '../../pages/flow/Flow/Flow.route';
 import { homeRoute } from '../../pages/home/Home/Home.route';
 import { libraryRoute } from '../../pages/library/Library/Library.route';
 import { projectCreateRoute } from '../../pages/projects/ProjectCreate/ProjectCreate.route';
 import { projectDetailRoute } from '../../pages/projects/ProjectDetail/ProjectDetail.route';
 import { projectListRoute } from '../../pages/projects/ProjectList/ProjectList.route';
+import { projectWorkspaceRoute } from '../../pages/projects/ProjectWorkspace/ProjectWorkspace.route';
 import { workspaceHomeRoute } from '../../pages/workspace/WorkspaceHome/WorkspaceHome.route';
 
 export type AppRoute = {
@@ -17,6 +19,7 @@ export type AppRoute = {
 
 export const appRoutes: AppRoute[] = [
   loginRoute,
+  flowRoute,
   homeRoute,
   workspaceHomeRoute,
   {
@@ -30,4 +33,5 @@ export const appRoutes: AppRoute[] = [
   libraryRoute,
   projectCreateRoute,
   projectDetailRoute,
+  projectWorkspaceRoute,
 ];
