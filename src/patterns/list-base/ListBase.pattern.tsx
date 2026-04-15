@@ -5,7 +5,7 @@ import { ListHeaderBlock } from '../../blocks/molecules/ListHeader.block';
 import { ListStateBlock } from '../../blocks/molecules/ListState.block';
 import { ListStatusTabsBlock, type ListStatusTab } from '../../blocks/molecules/ListStatusTabs.block';
 import { ListToolbarBlock } from '../../blocks/organisms/ListToolbar.block';
-import { globalTopNavActions, globalTopNavBrandIcon } from '../../navigation/globalTopNav';
+import { globalTopNavBrandIcon, useGlobalTopNavActions } from '../../navigation/globalTopNav';
 import type { ListFilterChip } from '../../blocks/molecules/ListFilterChips.block';
 import type { ListSortOption } from '../../blocks/molecules/ListSortSelect.block';
 
@@ -64,6 +64,8 @@ export function ListBasePattern({
   highlightNumber,
   children,
 }: Props): JSX.Element {
+  const globalTopNavActions = useGlobalTopNavActions();
+
   const highlightClass = (key: 'globalTopNav' | 'listHeader' | 'listToolbar' | 'listStatusTabs' | 'listContent'): string =>
     highlightBlockKey === key ? 'relative rounded-lg ring-2 ring-indigo-400 ring-offset-2 transition' : '';
 

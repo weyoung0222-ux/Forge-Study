@@ -2,13 +2,14 @@ import React from 'react';
 
 import { GlobalTopNavBlock } from '../../../blocks/molecules/GlobalTopNav.block';
 import { ScreenDescriptionPanelBlock } from '../../../blocks/organisms/ScreenDescriptionPanel.block';
+import { useLanguage } from '../../../context/LanguageContext';
 import {
   createGlobalTopNavItems,
   createTemporaryTopUtilityButtons,
-  globalTopNavActions,
   globalTopNavBrandIcon,
+  useGlobalTopNavActions,
 } from '../../../navigation/globalTopNav';
-import { homeDashboardUxDescription } from './HomeDashboard.ux';
+import { buildHomeDashboardUxDescription } from './HomeDashboard.ux';
 
 type Props = {
   onNavigate: (path: string) => void;
@@ -42,15 +43,20 @@ function WidgetPanel({ title, children }: { title: string; children: React.React
 }
 
 export function HomeDashboardScreen({ onNavigate }: Props): JSX.Element {
-  const navItems = createGlobalTopNavItems('home', onNavigate);
+  const { t } = useLanguage();
+  const globalTopNavActions = useGlobalTopNavActions();
+  const navItems = createGlobalTopNavItems('home', onNavigate, t);
   const [isUxOpen, setIsUxOpen] = React.useState(false);
   const [highlightedKey, setHighlightedKey] = React.useState<HomeHighlightKey | null>(null);
   const topUtilityButtons = createTemporaryTopUtilityButtons(
     () => setIsUxOpen(true),
     () => onNavigate('/'),
+    t,
   );
   const highlightedSectionClass = (key: HomeHighlightKey): string =>
     highlightedKey === key ? 'rounded-lg ring-2 ring-indigo-400 ring-offset-2 transition' : '';
+
+  const homeDashboardUxDescription = React.useMemo(() => buildHomeDashboardUxDescription(t), [t]);
 
   return (
     <>
@@ -67,19 +73,19 @@ export function HomeDashboardScreen({ onNavigate }: Props): JSX.Element {
         <div className={isUxOpen ? 'pr-0 transition-[padding] duration-300 lg:pr-[440px]' : 'transition-[padding] duration-300'}>
           <div className="mx-auto w-full max-w-7xl px-6 py-8">
             <header className="mb-6">
-              <h1 className="text-3xl font-semibold text-slate-900">Hello, Developer WIYOUNG.</h1>
-              <p className="mt-1 text-sm text-slate-600">Overview of your dashboard widgets.</p>
+              <h1 className="text-3xl font-semibold text-slate-900">{t('home.header.greeting')}</h1>
+              <p className="mt-1 text-sm text-slate-600">{t('home.header.subtitle')}</p>
             </header>
 
             <div className={['grid gap-4 md:grid-cols-3', highlightedSectionClass('overviewCards')].join(' ')}>
-              <WidgetCard title="Total Projects" subtitle="Value pending" />
-              <WidgetCard title="Datasets Created" subtitle="Value pending" />
-              <WidgetCard title="Model Fine-tuned" subtitle="Value pending" />
+              <WidgetCard title={t('home.widget.totalProjects')} subtitle={t('home.widget.pending')} />
+              <WidgetCard title={t('home.widget.datasetsCreated')} subtitle={t('home.widget.pending')} />
+              <WidgetCard title={t('home.widget.modelsTuned')} subtitle={t('home.widget.pending')} />
             </div>
 
             <div className="mt-4 grid gap-4 lg:grid-cols-3">
               <div className={['lg:col-span-2', highlightedSectionClass('bookmarkedProjects')].join(' ')}>
-                <WidgetPanel title="Bookmarked Projects">
+                <WidgetPanel title={t('home.panel.bookmarked')}>
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="h-40 rounded-md border border-slate-200 bg-slate-50" />
                     <div className="h-40 rounded-md border border-slate-200 bg-slate-50" />
@@ -87,7 +93,7 @@ export function HomeDashboardScreen({ onNavigate }: Props): JSX.Element {
                 </WidgetPanel>
               </div>
               <div className={highlightedSectionClass('myLibrary')}>
-                <WidgetPanel title="My Library">
+                <WidgetPanel title={t('home.panel.myLibrary')}>
                   <div className="space-y-2">
                     <div className="h-16 rounded-md border border-slate-200 bg-slate-50" />
                     <div className="h-16 rounded-md border border-slate-200 bg-slate-50" />
@@ -99,7 +105,7 @@ export function HomeDashboardScreen({ onNavigate }: Props): JSX.Element {
 
             <div className="mt-4 grid gap-4 lg:grid-cols-3">
               <div className={['lg:col-span-2', highlightedSectionClass('assignedJobs')].join(' ')}>
-                <WidgetPanel title="Assigned Jobs">
+                <WidgetPanel title={t('home.panel.assignedJobs')}>
                   <div className="space-y-2">
                     <div className="h-20 rounded-md border border-slate-200 bg-slate-50" />
                     <div className="h-20 rounded-md border border-slate-200 bg-slate-50" />
@@ -107,7 +113,7 @@ export function HomeDashboardScreen({ onNavigate }: Props): JSX.Element {
                 </WidgetPanel>
               </div>
               <div className={highlightedSectionClass('recentActivity')}>
-                <WidgetPanel title="Recent completed Activity">
+                <WidgetPanel title={t('home.panel.recentActivity')}>
                   <div className="space-y-2">
                     <div className="h-16 rounded-md border border-slate-200 bg-slate-50" />
                     <div className="h-16 rounded-md border border-slate-200 bg-slate-50" />
@@ -118,7 +124,7 @@ export function HomeDashboardScreen({ onNavigate }: Props): JSX.Element {
             </div>
 
             <div className={['mt-4', highlightedSectionClass('libraryFeed')].join(' ')}>
-              <WidgetPanel title="Library Feed">
+              <WidgetPanel title={t('home.panel.libraryFeed')}>
                 <div className="grid gap-2 md:grid-cols-2">
                   <div className="h-16 rounded-md border border-slate-200 bg-slate-50" />
                   <div className="h-16 rounded-md border border-slate-200 bg-slate-50" />

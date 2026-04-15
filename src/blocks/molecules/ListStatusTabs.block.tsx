@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { tabUnderlineItemActiveClasses, tabUnderlineItemInactiveClasses, tabUnderlineNavClasses } from '../styles/tabClasses';
+
 export type ListStatusTab = {
   label: string;
   value: string;
@@ -13,7 +15,7 @@ type Props = {
 
 export function ListStatusTabsBlock({ value, items, onChange }: Props): JSX.Element {
   return (
-    <nav aria-label="List status tabs" className="flex gap-4 border-b border-slate-200">
+    <nav aria-label="List status tabs" className={tabUnderlineNavClasses}>
       {items.map((item) => {
         const isActive = item.value === value;
         return (
@@ -21,12 +23,7 @@ export function ListStatusTabsBlock({ value, items, onChange }: Props): JSX.Elem
             key={item.value}
             type="button"
             onClick={() => onChange(item.value)}
-            className={[
-              'border-b-2 bg-transparent pb-2 text-sm transition-colors',
-              isActive
-                ? 'border-slate-900 font-semibold text-slate-900'
-                : 'border-transparent font-medium text-slate-500 hover:text-slate-800',
-            ].join(' ')}
+            className={isActive ? tabUnderlineItemActiveClasses : tabUnderlineItemInactiveClasses}
           >
             {item.label}
           </button>

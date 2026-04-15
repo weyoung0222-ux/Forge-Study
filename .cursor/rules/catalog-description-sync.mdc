@@ -9,6 +9,7 @@ When changing reusable UI units, maintain the unified `Catalog` menu and preview
 
 ## Must Follow
 - Use `src/descriptions/unitDefinitions.ts` as the single source of truth.
+- Follow `docs/policies/component-block-catalog-governance.md`: 블록을 이루는 시각 단위는 컴포넌트/토큰 카탈로그에 먼저 정의한다.
 - Keep unit taxonomy in `Catalog`: `components`, `blocks`, `pageTypes`.
 - Show only items where `renderable === true` and `usedInPrototype === true`.
 - If a unit cannot be rendered yet, do not expose it in the menu.

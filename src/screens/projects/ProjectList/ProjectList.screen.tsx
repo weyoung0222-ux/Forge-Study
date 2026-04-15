@@ -3,14 +3,14 @@ import React from 'react';
 import type { ListFilterChip } from '../../../blocks/molecules/ListFilterChips.block';
 import { ProjectCardGridBlock } from '../../../blocks/organisms/ProjectCardGrid.block';
 import { ScreenDescriptionPanelBlock } from '../../../blocks/organisms/ScreenDescriptionPanel.block';
+import { useLanguage } from '../../../context/LanguageContext';
 import { createGlobalTopNavItems, createTemporaryTopUtilityButtons } from '../../../navigation/globalTopNav';
 import { ListBasePattern } from '../../../patterns/list-base/ListBase.pattern';
 import { projectListRows } from '../../../data-spec/mocks/projectList.mock';
-import { projectListLayout } from './ProjectList.layout';
-import { projectListUxDescription } from './ProjectList.ux';
+import { buildProjectListUxDescription } from './ProjectList.ux';
 import {
-  projectSortOptions,
-  projectStatusTabs,
+  getProjectSortOptions,
+  getProjectStatusTabs,
   type ProjectRoleFilter,
   type ProjectSort,
 } from './ProjectList.schema';
@@ -54,33 +54,42 @@ export function ProjectListScreen({ onCreateProject, onProjectClick, onNavigate 
     return filtered;
   }, [roleFilter, search, sortValue, status]);
 
-  const roleChips: ListFilterChip[] = [
-    { key: 'all', label: 'All', active: roleFilter === 'all', onClick: () => setRoleFilter('all') },
-    {
-      key: 'project-owner',
-      label: 'Project Owner',
-      active: roleFilter === 'Project Owner',
-      onClick: () => setRoleFilter('Project Owner'),
-    },
-    {
-      key: 'data-developer',
-      label: 'Data Developer',
-      active: roleFilter === 'Data Developer',
-      onClick: () => setRoleFilter('Data Developer'),
-    },
-    {
-      key: 'model-developer',
-      label: 'Model Developer',
-      active: roleFilter === 'Model Developer',
-      onClick: () => setRoleFilter('Model Developer'),
-    },
-  ];
+  const { t } = useLanguage();
+  const projectStatusTabs = React.useMemo(() => getProjectStatusTabs(t), [t]);
+  const projectSortOptions = React.useMemo(() => getProjectSortOptions(t), [t]);
+  const projectListUxDescription = React.useMemo(() => buildProjectListUxDescription(t), [t]);
+
+  const roleChips: ListFilterChip[] = React.useMemo(
+    () => [
+      { key: 'all', label: t('projectList.filter.all'), active: roleFilter === 'all', onClick: () => setRoleFilter('all') },
+      {
+        key: 'project-owner',
+        label: t('projectList.filter.owner'),
+        active: roleFilter === 'Project Owner',
+        onClick: () => setRoleFilter('Project Owner'),
+      },
+      {
+        key: 'data-developer',
+        label: t('projectList.filter.dataDev'),
+        active: roleFilter === 'Data Developer',
+        onClick: () => setRoleFilter('Data Developer'),
+      },
+      {
+        key: 'model-developer',
+        label: t('projectList.filter.modelDev'),
+        active: roleFilter === 'Model Developer',
+        onClick: () => setRoleFilter('Model Developer'),
+      },
+    ],
+    [t, roleFilter],
+  );
 
   const listState = rows.length === 0 ? 'empty' : 'ready';
-  const navItems = createGlobalTopNavItems('projects', onNavigate);
+  const navItems = createGlobalTopNavItems('projects', onNavigate, t);
   const topUtilityButtons = createTemporaryTopUtilityButtons(
     () => setIsUxOpen(true),
     () => onNavigate('/'),
+    t,
   );
 
   return (
@@ -90,10 +99,10 @@ export function ProjectListScreen({ onCreateProject, onProjectClick, onNavigate 
           navItems={navItems}
           onHomeClick={() => onNavigate('/home')}
           topUtilityButtons={topUtilityButtons}
-          title={projectListLayout.pageTitle}
-          subtitle={projectListLayout.pageDescription}
+          title={t('projectList.pageTitle')}
+          subtitle={t('projectList.pageDescription')}
           onPrimaryAction={onCreateProject}
-          primaryActionLabel="Create Project"
+          primaryActionLabel={t('projectList.create')}
           highlightBlockKey={highlightedBlockKey ?? undefined}
           highlightNumber={highlightedNumber}
           searchValue={search}
@@ -108,8 +117,8 @@ export function ProjectListScreen({ onCreateProject, onProjectClick, onNavigate 
           state={listState}
           stateConfig={{
             kind: 'empty',
-            title: 'No projects found',
-            description: 'Try changing status or role filters to see matching projects.',
+            title: t('projectList.empty.title'),
+            description: t('projectList.empty.desc'),
           }}
         >
           <ProjectCardGridBlock items={rows} onCardClick={onProjectClick} />

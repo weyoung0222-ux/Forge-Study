@@ -1,0 +1,8 @@
+---
+description: English title case for UI titles, labels, and buttons
+alwaysApply: true
+---
+
+# Title case (English)
+
+Follow `docs/policies/title-case.md`. For English UI copy, use `toTitleCase` / `uiTitleCase` from `src/utils/titleCase.ts`. Use `uiTitleCase(text, locale)` when the string may be localized — apply title case only for `locale === 'en'`. Store English phrases in lowercase “sentence” form in code or `messages` when they are passed through `uiTitleCase`.

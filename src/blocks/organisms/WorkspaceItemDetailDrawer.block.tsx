@@ -1,5 +1,16 @@
 import React from 'react';
+
+import { CloseOutlined } from '../../icons';
 import { TablePaginationBlock } from '../molecules/TablePagination.block';
+import { buttonIconGhostClasses, buttonSecondaryMdClasses } from '../styles/buttonClasses';
+import {
+  chipSourceActivityClasses,
+  chipValidationFailCompactClasses,
+  chipValidationSuccessCompactClasses,
+  chipValidationWarnCompactClasses,
+} from '../styles/chipClasses';
+import { tabDrawerItemActiveClasses, tabDrawerItemInactiveClasses, tabDrawerNavClasses } from '../styles/tabClasses';
+import { formControlInputClasses, formControlSelectClasses } from '../styles/formFieldClasses';
 import { DataTableBlock, type DataTableColumn } from './DataTable.block';
 
 type DetailOverviewItem = {
@@ -80,12 +91,12 @@ export function WorkspaceItemDetailDrawerBlock({
   const statusChip = (value: 'success' | 'fail' | 'warn'): JSX.Element => {
     const className =
       value === 'success'
-        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+        ? chipValidationSuccessCompactClasses
         : value === 'fail'
-          ? 'border-rose-200 bg-rose-50 text-rose-700'
-          : 'border-amber-200 bg-amber-50 text-amber-700';
+          ? chipValidationFailCompactClasses
+          : chipValidationWarnCompactClasses;
     const label = value === 'success' ? 'Success' : value === 'fail' ? 'Fail' : 'Warn';
-    return <span className={['rounded-full border px-2 py-0.5 text-[10px] font-semibold', className].join(' ')}>{label}</span>;
+    return <span className={className}>{label}</span>;
   };
 
   const taskRows = pagedTaskRecords.map((record, index) => ({
@@ -111,36 +122,23 @@ export function WorkspaceItemDetailDrawerBlock({
           <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>
           <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-          aria-label="Close detail drawer"
-        >
-          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M5 5l10 10M15 5 5 15" />
-          </svg>
+        <button type="button" onClick={onClose} className={buttonIconGhostClasses} aria-label="Close detail drawer">
+          <CloseOutlined className="h-4 w-4" />
         </button>
       </div>
 
-      <nav className="mb-3 flex border-b border-slate-200">
+      <nav className={tabDrawerNavClasses}>
         <button
           type="button"
           onClick={() => setActiveTab('overview')}
-          className={[
-            'border-b-2 px-3 py-2 text-sm',
-            activeTab === 'overview' ? 'border-slate-900 font-semibold text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-800',
-          ].join(' ')}
+          className={activeTab === 'overview' ? tabDrawerItemActiveClasses : tabDrawerItemInactiveClasses}
         >
           Overview
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('taskDetails')}
-          className={[
-            'border-b-2 px-3 py-2 text-sm',
-            activeTab === 'taskDetails' ? 'border-slate-900 font-semibold text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-800',
-          ].join(' ')}
+          className={activeTab === 'taskDetails' ? tabDrawerItemActiveClasses : tabDrawerItemInactiveClasses}
         >
           Task Details
         </button>
@@ -160,7 +158,7 @@ export function WorkspaceItemDetailDrawerBlock({
                 ))}
               </div>
             </div>
-            <span className="rounded-full border border-slate-300 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-600">{source}</span>
+            <span className={[chipSourceActivityClasses, 'font-semibold'].join(' ')}>{source}</span>
           </div>
         </section>
       ) : (
@@ -170,14 +168,16 @@ export function WorkspaceItemDetailDrawerBlock({
               value={taskSearch}
               onChange={(event) => setTaskSearch(event.target.value)}
               placeholder="Search"
-              className="h-9 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700"
+              className={formControlInputClasses}
               aria-label="Search task details"
             />
-            <select className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700" aria-label="Version filter">
+            <select className={formControlSelectClasses} aria-label="Version filter">
               <option>Version v0.1</option>
               <option>Version v0.2</option>
             </select>
-            <button className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 hover:bg-slate-50">Export</button>
+            <button type="button" className={buttonSecondaryMdClasses}>
+              Export
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">

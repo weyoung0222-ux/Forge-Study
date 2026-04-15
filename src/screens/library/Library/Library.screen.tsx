@@ -4,23 +4,26 @@ import { ListSortSelectBlock } from '../../../blocks/molecules/ListSortSelect.bl
 import { ViewModeToggleBlock, type ViewMode } from '../../../blocks/molecules/ViewModeToggle.block';
 import { LibraryAssetGridBlock } from '../../../blocks/organisms/LibraryAssetGrid.block';
 import { ScreenDescriptionPanelBlock } from '../../../blocks/organisms/ScreenDescriptionPanel.block';
+import { useLanguage } from '../../../context/LanguageContext';
 import { createGlobalTopNavItems, createTemporaryTopUtilityButtons } from '../../../navigation/globalTopNav';
 import { ListBasePattern } from '../../../patterns/list-base/ListBase.pattern';
+import type { LibraryAssetItem } from '../../../data-spec/mocks/libraryAssets.mock';
 import { libraryAssetRows } from '../../../data-spec/mocks/libraryAssets.mock';
-import { libraryLayout } from './Library.layout';
-import { libraryUxDescription } from './Library.ux';
+import { buildLibraryUxDescription } from './Library.ux';
 import {
-  libraryAssetTabs,
-  librarySortOptions,
-  librarySourceOptions,
+  getLibraryAssetTabs,
+  getLibrarySortOptions,
+  getLibrarySourceOptions,
   type LibraryAssetTab,
   type LibrarySort,
   type LibrarySource,
 } from './Library.schema';
 
 type Props = {
-  onNavigate: (path: string) => void;
+  onNavigate: (path: string, options?: { state?: unknown }) => void;
   initialViewMode?: ViewMode;
+  /** 목록 복귀 시 선택 유지(라우트 state) */
+  selectedAssetId?: string;
 };
 
 type LibraryHighlightKey =
@@ -33,7 +36,7 @@ type LibraryHighlightKey =
   | 'libraryAssetCardSource'
   | 'libraryAssetCardMeta';
 
-export function LibraryScreen({ onNavigate, initialViewMode = 'list' }: Props): JSX.Element {
+export function LibraryScreen({ onNavigate, initialViewMode = 'list', selectedAssetId }: Props): JSX.Element {
   const [assetTab, setAssetTab] = React.useState<LibraryAssetTab>('dataset');
   const [search, setSearch] = React.useState('');
   const [sortValue, setSortValue] = React.useState<LibrarySort>('recent');
@@ -84,11 +87,22 @@ export function LibraryScreen({ onNavigate, initialViewMode = 'list' }: Props): 
     return filtered;
   }, [assetTab, search, sortValue, sourceFilter]);
 
-  const navItems = createGlobalTopNavItems('library', onNavigate);
+  const handleAssetSelect = (item: LibraryAssetItem): void => {
+    const path = item.type === 'dataset' ? `/library/datasets/${item.id}` : `/library/models/${item.id}`;
+    onNavigate(path, { state: { selectedAssetId: item.id } });
+  };
+
+  const { t } = useLanguage();
+  const navItems = createGlobalTopNavItems('library', onNavigate, t);
   const topUtilityButtons = createTemporaryTopUtilityButtons(
     () => setIsUxOpen(true),
     () => onNavigate('/'),
+    t,
   );
+  const libraryAssetTabs = React.useMemo(() => getLibraryAssetTabs(t), [t]);
+  const librarySortOptions = React.useMemo(() => getLibrarySortOptions(t), [t]);
+  const librarySourceOptions = React.useMemo(() => getLibrarySourceOptions(t), [t]);
+  const libraryUxDescription = React.useMemo(() => buildLibraryUxDescription(t), [t]);
 
   return (
     <>
@@ -97,8 +111,8 @@ export function LibraryScreen({ onNavigate, initialViewMode = 'list' }: Props): 
           navItems={navItems}
           onHomeClick={() => onNavigate('/home')}
           topUtilityButtons={topUtilityButtons}
-          title={libraryLayout.pageTitle}
-          subtitle={libraryLayout.pageDescription}
+          title={t('library.pageTitle')}
+          subtitle={t('library.pageDescription')}
           highlightBlockKey={
             highlightedBlockKey === 'libraryAssetGrid' ||
             highlightedBlockKey === 'libraryAssetCard' ||
@@ -121,7 +135,7 @@ export function LibraryScreen({ onNavigate, initialViewMode = 'list' }: Props): 
                 <ListSortSelectBlock
                   value={sourceFilter}
                   options={librarySourceOptions}
-                  ariaLabel="Filter by source"
+                  ariaLabel={t('library.filter.aria')}
                   onChange={(value) => setSourceFilter(value as LibrarySource)}
                 />
               </div>
@@ -140,8 +154,8 @@ export function LibraryScreen({ onNavigate, initialViewMode = 'list' }: Props): 
           state={rows.length === 0 ? 'empty' : 'ready'}
           stateConfig={{
             kind: 'empty',
-            title: 'No assets found',
-            description: 'Try changing tab, source, or search keyword.',
+            title: t('library.empty.title'),
+            description: t('library.empty.desc'),
           }}
         >
           <div className={highlightClass('libraryAssetGrid')}>
@@ -151,6 +165,8 @@ export function LibraryScreen({ onNavigate, initialViewMode = 'list' }: Props): 
               viewMode={viewMode}
               highlightPart={cardHighlightPart}
               highlightNumber={highlightedNumber}
+              selectedAssetId={selectedAssetId}
+              onAssetSelect={handleAssetSelect}
             />
           </div>
         </ListBasePattern>
@@ -173,7 +189,7 @@ export function LibraryScreen({ onNavigate, initialViewMode = 'list' }: Props): 
           setHighlightedBlockKey(null);
           setHighlightedNumber(null);
         }}
-        guideText="각 설명 카드에 마우스를 올리면 해당 블록이 화면에서 보라색 링으로 하이라이트됩니다."
+        guideText={t('library.guide.hover')}
       />
     </>
   );

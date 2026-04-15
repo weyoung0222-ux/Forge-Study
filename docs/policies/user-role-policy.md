@@ -31,6 +31,7 @@
   - `consumer`, `dev`, `supporter`, `admin`
   - Dev sub-roles: `project owner`, `data engineer`, `model engineer`
 - A single user may have multiple Dev sub-roles at the same time.
+- **Edit Profile (prototype):** Users who are not `project owner` on the current project see **Request access** for `data engineer` and/or `model engineer` when they do not already hold that sub-role (`EditProfilePanelBlock`).
 - When role definitions are updated, sync:
   - related screen behavior
   - block/catalog descriptions

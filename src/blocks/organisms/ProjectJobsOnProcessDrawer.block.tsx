@@ -1,8 +1,14 @@
 import React from 'react';
 
+import { CloseOutlined } from '../../icons';
+import { useLanguage } from '../../context/LanguageContext';
+import { uiTitleCase } from '../../utils/titleCase';
+
 import { ListToolbarBlock } from './ListToolbar.block';
 import type { LibrarySource } from '../../screens/library/Library/Library.schema';
 import type { WorkspaceJobItem } from '../../data-spec/mocks/workspaceJobs.mock';
+import { chipSourceActivityClasses } from '../styles/chipClasses';
+import { formControlSelectClasses } from '../styles/formFieldClasses';
 
 type Props = {
   isOpen: boolean;
@@ -13,6 +19,8 @@ type Props = {
 const sourceLabel = (source: LibrarySource): string => source.charAt(0).toUpperCase() + source.slice(1);
 
 export function ProjectJobsOnProcessDrawerBlock({ isOpen, jobs, onClose }: Props): JSX.Element | null {
+  const { t, locale } = useLanguage();
+  const drawerTitle = uiTitleCase(t('workspace.jobsButton'), locale);
   const [searchValue, setSearchValue] = React.useState('');
   const [sourceFilter, setSourceFilter] = React.useState<LibrarySource | 'all'>('all');
   const [statusFilter, setStatusFilter] = React.useState<'all' | 'running' | 'queued' | 'blocked'>('all');
@@ -28,28 +36,77 @@ export function ProjectJobsOnProcessDrawerBlock({ isOpen, jobs, onClose }: Props
     });
   }, [jobs, searchValue, sourceFilter, statusFilter]);
 
-  if (!isOpen) return null;
+  const [mounted, setMounted] = React.useState(isOpen);
+  const [panelIn, setPanelIn] = React.useState(false);
+
+  const TRANSITION_MS = 320;
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setMounted(true);
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setPanelIn(true));
+      });
+      return () => cancelAnimationFrame(id);
+    }
+    setPanelIn(false);
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    if (!isOpen && !mounted) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isOpen, mounted]);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
+  const handleAsideTransitionEnd = (event: React.TransitionEvent<HTMLElement>): void => {
+    if (event.propertyName !== 'transform') return;
+    if (!isOpen) setMounted(false);
+  };
+
+  if (!isOpen && !mounted) return null;
 
   return (
-    <div className="fixed inset-0 z-40 bg-slate-900/35" onClick={onClose}>
+    <div
+      className={['fixed inset-0 z-40 bg-slate-900/35 transition-opacity ease-out', panelIn ? 'opacity-100' : 'opacity-0'].join(
+        ' ',
+      )}
+      style={{ transitionDuration: `${TRANSITION_MS}ms` }}
+      onClick={onClose}
+    >
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="Jobs on process"
+        aria-label={drawerTitle}
         onClick={(event) => event.stopPropagation()}
-        className="absolute inset-y-0 right-0 w-[96vw] max-w-[920px] overflow-y-auto border-l border-slate-200 bg-white p-4 shadow-2xl"
+        onTransitionEnd={handleAsideTransitionEnd}
+        className={[
+          'absolute inset-y-0 right-0 w-[96vw] max-w-[920px] overflow-y-auto border-l border-slate-200 bg-white p-4 shadow-2xl will-change-transform',
+          'transform transition-transform ease-out',
+          panelIn ? 'translate-x-0' : 'translate-x-full',
+        ].join(' ')}
+        style={{ transitionDuration: `${TRANSITION_MS}ms` }}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">Jobs on process</h2>
+          <h2 className="text-xl font-semibold text-slate-900">{drawerTitle}</h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
             aria-label="Close jobs drawer"
           >
-            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M5 5l10 10M15 5 5 15" />
-            </svg>
+            <CloseOutlined className="h-4 w-4" />
           </button>
         </div>
 
@@ -57,8 +114,8 @@ export function ProjectJobsOnProcessDrawerBlock({ isOpen, jobs, onClose }: Props
           <ListToolbarBlock
             searchValue={searchValue}
             onSearchChange={setSearchValue}
-            searchPlaceholder="Search jobs..."
-            searchAriaLabel="Search jobs on process"
+            searchPlaceholder={`${uiTitleCase('search jobs', locale)}...`}
+            searchAriaLabel={uiTitleCase(t('workspace.jobsSearchAria'), locale)}
             chips={[]}
             sortValue={sourceFilter}
             sortOptions={[
@@ -77,7 +134,7 @@ export function ProjectJobsOnProcessDrawerBlock({ isOpen, jobs, onClose }: Props
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value as 'all' | 'running' | 'queued' | 'blocked')}
                 aria-label="Status filter"
-                className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700"
+                className={formControlSelectClasses}
               >
                 <option value="all">Status : All</option>
                 <option value="running">Status : Running</option>
@@ -96,9 +153,7 @@ export function ProjectJobsOnProcessDrawerBlock({ isOpen, jobs, onClose }: Props
                   <p className="text-sm font-semibold text-slate-900">{job.name}</p>
                   <p className="mt-1 text-xs text-slate-600">{job.description}</p>
                 </div>
-                <span className="rounded-full border border-slate-300 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
-                  {sourceLabel(job.source)}
-                </span>
+                <span className={[chipSourceActivityClasses, 'font-semibold text-slate-600'].join(' ')}>{sourceLabel(job.source)}</span>
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600">
                 <span>Worker: {job.worker}</span>

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { formControlSelectClasses } from '../styles/formFieldClasses';
+
 export type FilterChip = {
   key: string;
   label: string;
@@ -63,7 +65,7 @@ export function FilterBarBlock({
           value={select.value}
           onChange={(event) => select.onChange(event.target.value)}
           aria-label={select.ariaLabel}
-          style={idx === 0 ? { marginLeft: 'auto' } : undefined}
+          className={[formControlSelectClasses, 'min-w-[140px]', idx === 0 ? 'ml-auto' : ''].filter(Boolean).join(' ')}
         >
           {select.options.map((option) => (
             <option key={option.value} value={option.value}>

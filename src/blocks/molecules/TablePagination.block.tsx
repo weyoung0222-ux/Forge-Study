@@ -1,5 +1,9 @@
 import React from 'react';
 
+import { DoubleLeftOutlined, DoubleRightOutlined, LeftOutlined, RightOutlined } from '../../icons';
+import { buttonPaginationNavClasses } from '../styles/buttonClasses';
+import { formControlSelectClasses } from '../styles/formFieldClasses';
+
 type Props = {
   currentPage: number;
   pageSize: number;
@@ -52,8 +56,7 @@ export function TablePaginationBlock({
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const safePage = Math.min(Math.max(1, currentPage), totalPages);
   const pageItems = createPageItems(safePage, totalPages);
-  const buttonBaseClass =
-    'inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-700 hover:bg-slate-50';
+  const buttonBaseClass = buttonPaginationNavClasses;
 
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-0 py-2">
@@ -70,7 +73,7 @@ export function TablePaginationBlock({
             ].join(' ')}
             aria-label="First page"
           >
-            {'<<'}
+            <DoubleLeftOutlined className="h-3.5 w-3.5" />
           </button>
           <button
             type="button"
@@ -82,7 +85,7 @@ export function TablePaginationBlock({
             ].join(' ')}
             aria-label="Previous page"
           >
-            {'<'}
+            <LeftOutlined className="h-3.5 w-3.5" />
           </button>
 
           {pageItems.map((item, idx) =>
@@ -117,7 +120,7 @@ export function TablePaginationBlock({
             ].join(' ')}
             aria-label="Next page"
           >
-            {'>'}
+            <RightOutlined className="h-3.5 w-3.5" />
           </button>
           <button
             type="button"
@@ -129,7 +132,7 @@ export function TablePaginationBlock({
             ].join(' ')}
             aria-label="Last page"
           >
-            {'>>'}
+            <DoubleRightOutlined className="h-3.5 w-3.5" />
           </button>
       </div>
 
@@ -138,7 +141,7 @@ export function TablePaginationBlock({
             value={pageSize}
             onChange={(event) => onPageSizeChange?.(Number(event.target.value))}
             disabled={!onPageSizeChange}
-            className="h-9 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-700 disabled:bg-slate-100 disabled:text-slate-400"
+            className={[formControlSelectClasses, 'disabled:bg-slate-100 disabled:text-slate-400'].join(' ')}
             aria-label="Rows per page"
           >
             {pageSizeOptions.map((size) => (

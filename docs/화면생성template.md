@@ -5,6 +5,7 @@
 - `blocks`는 재사용 가능해야 한다.
 - 새로운 UI는 반드시 `block`으로 먼저 정의한 뒤 화면에서 사용한다.
 - `blocks catalog`(registry + catalog preview)는 항상 최신 상태로 유지한다.
+- 화면이 추가/변경되면 `src/pages/flow/Flow/Flow.page.tsx`의 Screen List를 반드시 함께 업데이트한다.
 - `Source` 표기는 `docs/policies/source-policy.md`를 따른다.
 - `Source`는 activity 기반 값(`register`, `collector`, `generator`, `curator`, `trainer`, `evaluator`)만 사용한다.
 
@@ -50,3 +51,18 @@
 - Catalog 항목 노출/검색/미리보기 정상 동작 확인
 - Description(우측 패널) 연동 화면의 하이라이트 동작 확인
 - 변경 파일 lint 에러 확인 및 정리
+
+## 7) IA(Screen List) 관리 규칙
+- IA 표는 `src/pages/flow/Flow/Flow.page.tsx`에서 관리한다.
+- Screen ID는 `XX_YY_00` 규칙을 사용한다.
+  - `XX`: 도메인 코드 (CM/DV/SC/AC/CS)
+  - `YY`: Depth1 코드
+  - `00`: 동일 `XX_YY` 그룹 내 오름차순 번호 (자동 생성)
+- 새 화면 추가 시:
+  1. IA 항목(`iaItems`) 추가
+  2. Depth 트리에 맞는 위치로 배치
+  3. 팝업이면 `linkedToKey` 연결 관계 함께 등록
+- 기존 화면 수정 시:
+  1. IA 항목의 depth/화면명/설명/path 갱신
+  2. 팝업 연결 대상 변경 시 `linkedToKey` 동시 갱신
+- Confirmation 전용 팝업은 IA 기본 목록에서 제외하고, 별도 운영 문서가 필요할 때만 추가한다.

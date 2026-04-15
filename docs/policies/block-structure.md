@@ -49,3 +49,6 @@ This guide defines how block-related folders and file names should be interprete
 - If a UI shape appears in two or more patterns, extract it into `src/blocks`.
 - Registry entries must always match actual block files.
 - List screens should prefer `list-base` first, then extend only for domain-specific content blocks.
+
+## See also
+- **Component vs block vs Catalog:** `docs/policies/component-block-catalog-governance.md` — 블록을 이루는 칩·인풋 등은 컴포넌트/토큰으로 먼저 등록한다.

@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { formControlSearchInputClasses } from '../styles/formFieldClasses';
+
 type Props = {
   value?: string;
   placeholder?: string;
@@ -15,7 +17,7 @@ export function ListSearchInputBlock({ value, placeholder = 'Search', ariaLabel,
       placeholder={placeholder}
       aria-label={ariaLabel}
       onChange={(event) => onChange(event.target.value)}
-      className="h-9 w-64 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none"
+      className={formControlSearchInputClasses}
     />
   );
 }

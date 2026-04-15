@@ -20,16 +20,127 @@ import { ProjectSelectorPanelBlock } from '../../../blocks/organisms/ProjectSele
 import { ProjectTaskListBlock } from '../../../blocks/organisms/ProjectTaskList.block';
 import { ProjectCardGridBlock } from '../../../blocks/organisms/ProjectCardGrid.block';
 import { ProjectJobsOnProcessDrawerBlock } from '../../../blocks/organisms/ProjectJobsOnProcessDrawer.block';
-import { WorkPageShellBlock } from '../../../blocks/organisms/WorkPageShell.block';
+import { ActivityDraftHistoryDrawerBlock } from '../../../blocks/organisms/ActivityDraftHistoryDrawer.block';
+import { ActivitySaveDatasetBlock } from '../../../blocks/organisms/ActivitySaveDataset.block';
+import { CollectTeleoperationStepBlock } from '../../../blocks/organisms/CollectTeleoperationStep.block';
+import { SyntheticVideoCreationStepBlock } from '../../../blocks/organisms/SyntheticVideoCreationStep.block';
+import { ActivityValidationBlock } from '../../../blocks/organisms/ActivityValidation.block';
+import { WorkPageShellBlock, type WorkFlowStep } from '../../../blocks/organisms/WorkPageShell.block';
 import { WorkPageTemplateCanvasBlock } from '../../../blocks/organisms/WorkPageTemplateCanvas.block';
 import { ProjectWorkspaceActivityCardsBlock } from '../../../blocks/organisms/ProjectWorkspaceActivityCards.block';
 import { ProjectWorkspaceSidebarBlock } from '../../../blocks/organisms/ProjectWorkspaceSidebar.block';
 import { WorkspaceItemDetailDrawerBlock } from '../../../blocks/organisms/WorkspaceItemDetailDrawer.block';
+import { EditProfilePanelBlock } from '../../../blocks/organisms/EditProfilePanel.block';
+import { InviteMemberPanelBlock } from '../../../blocks/organisms/InviteMemberPanel.block';
+import { ToastBlock } from '../../../blocks/molecules/Toast.block';
+import { ButtonCatalogShowcase } from '../../../blocks/molecules/Button.block';
+import { ChipCatalogVariantShowcase } from '../../../blocks/molecules/Chip.block';
+import { FormTagInputBlock } from '../../../blocks/molecules/FormTagInput.block';
+import { WorkPageFormFieldBlock } from '../../../blocks/molecules/WorkPageFormField.block';
+import { WorkPageFileUploadDropzoneBlock } from '../../../blocks/molecules/WorkPageFileUploadDropzone.block';
+import { TabsShowcaseBlock } from '../../../blocks/molecules/TabsShowcase.block';
+import { RobotSelectCardBlock } from '../../../blocks/molecules/RobotSelectCard.block';
 import { libraryAssetRows } from '../../../data-spec/mocks/libraryAssets.mock';
+import { projectCreateRobotOptions } from '../../../data-spec/mocks/projectCreateRobots.mock';
+import { activityDraftSessionsMock } from '../../../data-spec/mocks/activityDraftHistory.mock';
+import {
+  filterInviteDirectoryUsers,
+  inviteDirectoryUsers,
+  INVITE_MEMBER_ROLE_OPTIONS,
+} from '../../../data-spec/mocks/inviteDirectory.mock';
+import { getActivitySaveSummary, getDefaultSaveDraft } from '../../../data-spec/mocks/activitySaveDataset.mock';
 import { projectListRows } from '../../../data-spec/mocks/projectList.mock';
 import { blockUnitItems, componentUnitItems, overlayUnitItems, screenPatternUnitItems } from '../../../descriptions/unitDefinitions';
+import { buttonPrimaryMdClasses, buttonTableRowActionSmClasses } from '../../../blocks/styles/buttonClasses';
+import { chipSourceActivityClasses } from '../../../blocks/styles/chipClasses';
+import {
+  formControlInputClasses,
+  formControlInputMaxSmClasses,
+  formControlSelectClasses,
+  formControlTextareaClasses,
+} from '../../../blocks/styles/formFieldClasses';
+import { useLanguage } from '../../../context/LanguageContext';
+import { createGlobalTopNavItems, globalTopNavBrandIcon, useGlobalTopNavActions } from '../../../navigation/globalTopNav';
 
 type DescriptionTab = 'components' | 'blocks' | 'overlays' | 'screenPatterns';
+
+function EditProfileCatalogPreview(): JSX.Element {
+  const [name, setName] = React.useState('Mina Park');
+  return (
+    <div className="max-h-[min(440px,75vh)] overflow-auto rounded-md border border-slate-200 bg-white p-2">
+      <EditProfilePanelBlock
+        displayName={name}
+        onDisplayNameChange={setName}
+        roles={['data engineer']}
+        onSave={() => {}}
+        onCancel={() => {}}
+        onRequestDevRole={() => {}}
+      />
+    </div>
+  );
+}
+
+function InviteMemberCatalogPreview(): JSX.Element {
+  const [email, setEmail] = React.useState('sam');
+  const [results, setResults] = React.useState(() => filterInviteDirectoryUsers('sam', inviteDirectoryUsers));
+  const [sel, setSel] = React.useState<string | null>('inv-u1');
+  const [role, setRole] = React.useState(INVITE_MEMBER_ROLE_OPTIONS[1]!.value);
+  return (
+    <div className="max-h-[min(480px,80vh)] overflow-auto rounded-md border border-slate-200 bg-white p-2">
+      <InviteMemberPanelBlock
+        emailQuery={email}
+        onEmailQueryChange={setEmail}
+        onSearch={() => {
+          setResults(filterInviteDirectoryUsers(email, inviteDirectoryUsers));
+          setSel(null);
+        }}
+        searchResults={results}
+        selectedUserId={sel}
+        onSelectUser={setSel}
+        inviteRole={role}
+        onInviteRoleChange={setRole}
+        roleOptions={INVITE_MEMBER_ROLE_OPTIONS}
+        onInvite={() => {}}
+        onCancel={() => {}}
+      />
+    </div>
+  );
+}
+
+function FormTagInputCatalogPreview(): JSX.Element {
+  const [tags, setTags] = React.useState(['tag1', 'tag2', 'tag3', 'tag4']);
+  return (
+    <div className="w-full max-w-sm rounded-md border border-slate-200 bg-white p-3">
+      <FormTagInputBlock
+        label="Tags"
+        tags={tags}
+        onTagsChange={setTags}
+        inputPlaceholder="Placeholder"
+        inputAriaLabel="Add tags"
+      />
+    </div>
+  );
+}
+
+function WorkPageFileUploadDropzoneCatalogPreview(): JSX.Element {
+  const [fileName, setFileName] = React.useState('');
+  return (
+    <div className="w-full max-w-md rounded-md border border-slate-200 bg-white p-3">
+      <WorkPageFileUploadDropzoneBlock selectedFileName={fileName} onFileChange={(f) => setFileName(f?.name ?? '')} />
+    </div>
+  );
+}
+
+function WorkPageFormFieldCatalogPreview(): JSX.Element {
+  const [v, setV] = React.useState('');
+  return (
+    <div className="w-full max-w-sm rounded-md border border-slate-200 bg-white p-3">
+      <WorkPageFormFieldBlock label="Sample field" required>
+        <input className={formControlInputClasses} value={v} onChange={(e) => setV(e.target.value)} placeholder="Placeholder" />
+      </WorkPageFormFieldBlock>
+    </div>
+  );
+}
 
 type SampleCardProps = {
   title: string;
@@ -40,6 +151,7 @@ type SampleCardProps = {
 };
 
 function SampleCard({ title, blockId, description, codePath, children }: SampleCardProps): JSX.Element {
+  const { t } = useLanguage();
   const handleOpenCode = async (): Promise<void> => {
     const workspaceRoot = '/Users/wiyoung/Downloads/Forge_1';
     const absPath = `${workspaceRoot}/${codePath}`.replace(/\/+/g, '/');
@@ -70,13 +182,13 @@ function SampleCard({ title, blockId, description, codePath, children }: SampleC
             className="rounded-md border border-blue-200 bg-white px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50"
             title={codePath}
           >
-            코드 열기
+            {t('catalog.sampleCard.openCode')}
           </button>
         </div>
       </div>
       <div className="grid gap-3 p-4">
         <div>
-          <p className="text-sm font-medium text-slate-900">Description</p>
+          <p className="text-sm font-medium text-slate-900">{t('common.description')}</p>
           <p className="mt-1 text-sm text-slate-600">{description}</p>
           <p className="mt-2 rounded bg-slate-100 px-2 py-1 font-mono text-[11px] text-slate-600">{codePath}</p>
         </div>
@@ -88,19 +200,41 @@ function SampleCard({ title, blockId, description, codePath, children }: SampleC
   );
 }
 
+function CatalogGlobalTopNavPreview(): JSX.Element {
+  const { t } = useLanguage();
+  const actions = useGlobalTopNavActions();
+  return (
+    <div className="overflow-hidden rounded-md border border-slate-200">
+      <GlobalTopNavBlock
+        brand="PhysicalWorksForge"
+        brandIcon={globalTopNavBrandIcon}
+        onBrandClick={() => {}}
+        items={createGlobalTopNavItems('home', () => {}, t)}
+        actions={actions}
+      />
+    </div>
+  );
+}
+
 export function CatalogPage(): JSX.Element {
+  const { t } = useLanguage();
   const [sampleStatus, setSampleStatus] = React.useState('all');
   const [sampleViewMode, setSampleViewMode] = React.useState<ViewMode>('grid');
   const [sampleTab, setSampleTab] = React.useState<DescriptionTab>('components');
   const [searchKeyword, setSearchKeyword] = React.useState('');
   const [isPageExampleOpen, setIsPageExampleOpen] = React.useState(false);
   const [pageExamplePath, setPageExamplePath] = React.useState<string | null>(null);
-  const tabLabelMap: Record<DescriptionTab, string> = {
-    components: 'Components',
-    blocks: 'Blocks',
-    overlays: 'Overlay',
-    screenPatterns: 'Screen Patterns',
-  };
+  const [catalogWorkFlowStep, setCatalogWorkFlowStep] = React.useState<WorkFlowStep>(2);
+  const catalogWorkFlowMax: WorkFlowStep = 3;
+  const tabLabelMap = React.useMemo(
+    (): Record<DescriptionTab, string> => ({
+      components: t('catalog.tabLabel.components'),
+      blocks: t('catalog.tabLabel.blocks'),
+      overlays: t('catalog.tabLabel.overlays'),
+      screenPatterns: t('catalog.tabLabel.screenPatterns'),
+    }),
+    [t],
+  );
 
   const activeItems = (
     sampleTab === 'components'
@@ -129,17 +263,23 @@ export function CatalogPage(): JSX.Element {
   }, [filteredItems, selectedId]);
 
   const renderPreview = (id: string): React.ReactNode => {
-    if (id === 'component.button') {
+    if (id === 'component.toast') {
       return (
-        <div className="flex gap-2">
-          <button className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white">Primary</button>
-          <button className="rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700">Secondary</button>
-        </div>
+        <ToastBlock
+          layout="inline"
+          message="New dataset has been created."
+          isOpen
+          onDismiss={() => {}}
+          autoHideMs={0}
+        />
       );
     }
-    if (id === 'component.select' || id === 'component.dropdown') {
+    if (id === 'component.button') {
+      return <ButtonCatalogShowcase />;
+    }
+    if (id === 'component.select') {
       return (
-        <select className="h-9 rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-800">
+        <select className={formControlSelectClasses}>
           <option>Option A</option>
           <option>Option B</option>
         </select>
@@ -149,17 +289,24 @@ export function CatalogPage(): JSX.Element {
       return (
         <input
           placeholder="Type here..."
-          className="h-9 w-full max-w-sm rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-800"
+          className={formControlInputMaxSmClasses}
         />
       );
     }
-    if (id === 'component.chip') {
+    if (id === 'component.textarea') {
       return (
-        <div className="flex gap-2">
-          <span className="rounded-full border border-slate-300 px-3 py-1 text-xs text-slate-700">Default</span>
-          <span className="rounded-full bg-slate-900 px-3 py-1 text-xs text-white">Active</span>
-        </div>
+        <textarea
+          placeholder="Multiple lines…"
+          rows={4}
+          className={[formControlTextareaClasses, 'max-w-sm'].join(' ')}
+        />
       );
+    }
+    if (id === 'component.tabs') {
+      return <TabsShowcaseBlock />;
+    }
+    if (id === 'component.chip') {
+      return <ChipCatalogVariantShowcase />;
     }
     if (id === 'component.toggle') {
       return <ViewModeToggleBlock value={sampleViewMode} onChange={setSampleViewMode} />;
@@ -194,6 +341,21 @@ export function CatalogPage(): JSX.Element {
         />
       );
     }
+    if (id === 'desc-rfm.listStatusTabs') {
+      return (
+        <div className="rounded-md border border-slate-200 bg-white p-3">
+          <ListStatusTabsBlock
+            value={sampleStatus}
+            onChange={setSampleStatus}
+            items={[
+              { label: 'All', value: 'all' },
+              { label: 'In Progress', value: 'in-progress' },
+              { label: 'Completed', value: 'completed' },
+            ]}
+          />
+        </div>
+      );
+    }
     if (id === 'desc-rfm.libraryAssetGrid') {
       return <LibraryAssetGridBlock items={libraryAssetRows.slice(0, 4)} viewMode={sampleViewMode} />;
     }
@@ -210,14 +372,22 @@ export function CatalogPage(): JSX.Element {
             {
               no: '1',
               name: 'Warehouse Scenarios Collection',
-              source: <span className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px]">Generator</span>,
-              action: <button className="rounded border border-slate-300 px-2 py-0.5 text-[10px]">Publish</button>,
+              source: <span className={chipSourceActivityClasses}>Generator</span>,
+              action: (
+                <button type="button" className={buttonTableRowActionSmClasses}>
+                  Publish
+                </button>
+              ),
             },
             {
               no: '2',
               name: 'Dexmate Motion Dataset',
-              source: <span className="rounded-full border border-slate-300 px-2 py-0.5 text-[10px]">Curator</span>,
-              action: <button className="rounded border border-slate-300 px-2 py-0.5 text-[10px]">Publish</button>,
+              source: <span className={chipSourceActivityClasses}>Curator</span>,
+              action: (
+                <button type="button" className={buttonTableRowActionSmClasses}>
+                  Publish
+                </button>
+              ),
             },
           ]}
         />
@@ -278,15 +448,37 @@ export function CatalogPage(): JSX.Element {
             { key: 'generator', title: 'Generate', description: 'Augment and produce datasets.' },
             { key: 'curator', title: 'Curate', description: 'Merge datasets and create a new data.' },
           ]}
+          activityMenus={{
+            generator: [
+              { id: 'synthetic-video', label: 'Synthetic Video Generation' },
+              { id: 'mimic-augmentation', label: 'Mimic Augmentation' },
+              { id: 'idm', label: 'IDM' },
+            ],
+          }}
+          onSelectActivityMenuOption={() => {}}
         />
       );
     }
     if (id === 'desc-rfm.projectInfoListPanel') {
       return (
-        <ProjectInfoListPanelBlock
-          title="Recent completed Activity"
-          items={[{ id: '1', title: '{Output Name}', subtitle: '(Work Description)', meta: 'Mar 26, 2026 · {User Name}', badge: 'Trainer' }]}
-        />
+        <div className="space-y-4">
+          <ProjectInfoListPanelBlock
+            title="Recent completed Activity"
+            items={[{ id: '1', title: '{Output Name}', subtitle: '(Work Description)', meta: 'Mar 26, 2026 · {User Name}', badge: 'Trainer' }]}
+          />
+          <ProjectInfoListPanelBlock
+            title="Member (avatar + role chips)"
+            items={[
+              {
+                id: 'm-1',
+                title: 'Alex Chen',
+                subtitle: 'alex.chen@company.com',
+                meta: 'Last active · Today',
+                member: { avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Catalog1', roles: ['project owner'] },
+              },
+            ]}
+          />
+        </div>
       );
     }
     if (id === 'desc-rfm.projectRobotInfoPanel') {
@@ -325,18 +517,7 @@ export function CatalogPage(): JSX.Element {
       );
     }
     if (id === 'desc-rfm.globalTopNav') {
-      return (
-        <div className="overflow-hidden rounded-md border border-slate-200">
-          <GlobalTopNavBlock
-            brand="PhysicalWorksForge"
-            items={[
-              { key: 'home', label: 'Home', active: true },
-              { key: 'projects', label: 'Projects' },
-              { key: 'library', label: 'Library' },
-            ]}
-          />
-        </div>
-      );
+      return <CatalogGlobalTopNavPreview />;
     }
     if (id === 'desc-rfm.overlayDialog') {
       return (
@@ -445,6 +626,20 @@ export function CatalogPage(): JSX.Element {
         </div>
       );
     }
+    if (id === 'desc-rfm.activityDraftHistoryDrawer') {
+      return (
+        <div className="relative h-64 overflow-hidden rounded-md border border-slate-200 bg-slate-50">
+          <div className="absolute inset-y-0 right-0 w-[85%] max-w-md">
+            <ActivityDraftHistoryDrawerBlock
+              isOpen
+              drafts={activityDraftSessionsMock.slice(0, 3)}
+              onClose={() => {}}
+              onSelectDraft={() => {}}
+            />
+          </div>
+        </div>
+      );
+    }
     if (id === 'desc-rfm.projectJobsOnProcessDrawer') {
       return (
         <div className="relative h-56 overflow-hidden rounded-md border border-slate-200 bg-slate-50">
@@ -481,13 +676,75 @@ export function CatalogPage(): JSX.Element {
         </div>
       );
     }
+    if (id === 'desc-rfm.formTagInput') {
+      return <FormTagInputCatalogPreview />;
+    }
+    if (id === 'desc-rfm.workPageFormField') {
+      return <WorkPageFormFieldCatalogPreview />;
+    }
+    if (id === 'desc-rfm.workPageFileUploadDropzone') {
+      return <WorkPageFileUploadDropzoneCatalogPreview />;
+    }
     if (id === 'desc-rfm.workPageTemplateCanvas') {
       return <WorkPageTemplateCanvasBlock variant="type1-parameter-preview" />;
     }
+    if (id === 'desc-rfm.collectTeleoperationStep') {
+      return (
+        <div className="max-h-[min(560px,82vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <CollectTeleoperationStepBlock onProceedToStep2={() => {}} />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.syntheticVideoCreationStep') {
+      return (
+        <div className="max-h-[min(560px,82vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <SyntheticVideoCreationStepBlock onProceedToStep2={() => {}} />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.activityValidation') {
+      return (
+        <div className="max-h-[min(480px,70vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <ActivityValidationBlock
+            onPrevious={() => {}}
+            onApplyPreprocessorResult={() => {}}
+            onSkipPreprocessor={() => {}}
+          />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.activitySaveDataset') {
+      const draft = getDefaultSaveDraft('register');
+      return (
+        <div className="max-h-[min(520px,78vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <ActivitySaveDatasetBlock
+            datasetName={draft.datasetName}
+            datasetDescription={draft.description}
+            onDatasetNameChange={() => {}}
+            onDatasetDescriptionChange={() => {}}
+            summary={getActivitySaveSummary('register')}
+          />
+        </div>
+      );
+    }
     if (id === 'desc-rfm.workPageShell') {
       return (
-        <div className="rounded-md border border-slate-200 bg-slate-50 p-2 text-xs text-slate-600">
-          WorkPageShellBlock renders as full-size popup. Open workspace activity cards to see full interaction.
+        <div className="h-[380px] overflow-hidden rounded-md border border-slate-200 bg-slate-100">
+          <WorkPageShellBlock
+            embedded
+            isOpen
+            title="{Work Name}"
+            description="Register, manage, and organize datasets with metadata, tags, ownership, and version tracking."
+            currentStep={catalogWorkFlowStep}
+            maxUnlockedStep={catalogWorkFlowMax}
+            onStepChange={setCatalogWorkFlowStep}
+            onClose={() => {}}
+            onHistoryClick={() => {}}
+          >
+            <p className="text-sm text-slate-600">
+              Step {catalogWorkFlowStep} preview — open Workspace activity for full flow. Max unlocked: {catalogWorkFlowMax}.
+            </p>
+          </WorkPageShellBlock>
         </div>
       );
     }
@@ -518,9 +775,11 @@ export function CatalogPage(): JSX.Element {
     if (id === 'page.form') {
       return (
         <div className="grid max-w-sm gap-2">
-          <input className="h-9 rounded-md border border-slate-300 px-3 text-sm" placeholder="Name" />
-          <input className="h-9 rounded-md border border-slate-300 px-3 text-sm" placeholder="Description" />
-          <button className="h-9 rounded-md bg-slate-900 text-sm font-semibold text-white">Save</button>
+          <input className={formControlInputMaxSmClasses} placeholder="Name" />
+          <input className={formControlInputMaxSmClasses} placeholder="Description" />
+          <button type="button" className={buttonPrimaryMdClasses}>
+            Save
+          </button>
         </div>
       );
     }
@@ -538,6 +797,18 @@ export function CatalogPage(): JSX.Element {
         </div>
       );
     }
+    if (id === 'page.settings') {
+      return (
+        <div className="grid gap-2">
+          <div className="h-10 rounded-md border border-slate-200 bg-slate-50" />
+          <div className="h-8 rounded-md border border-slate-200 bg-slate-50" />
+          <div className="grid gap-2 md:grid-cols-2">
+            <div className="h-24 rounded-md border border-slate-200 bg-slate-50" />
+            <div className="h-24 rounded-md border border-slate-200 bg-slate-50" />
+          </div>
+        </div>
+      );
+    }
     if (id === 'page.work') {
       return (
         <div className="grid gap-2">
@@ -550,43 +821,71 @@ export function CatalogPage(): JSX.Element {
         </div>
       );
     }
-    return <p className="text-xs text-slate-500">Preview is not defined for this unit yet.</p>;
+    if (id === 'desc-rfm.robotSelectCard') {
+      const sample = projectCreateRobotOptions[0];
+      return (
+        <div className="max-w-[200px]">
+          <RobotSelectCardBlock option={sample} selected={false} onSelect={() => {}} />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.editProfilePanel') {
+      return <EditProfileCatalogPreview />;
+    }
+    if (id === 'desc-rfm.inviteMemberPanel') {
+      return <InviteMemberCatalogPreview />;
+    }
+    if (id === 'page.createProjectRobot') {
+      return (
+        <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,200px)]">
+          <div className="flex h-28 items-center justify-center rounded-md border border-dashed border-slate-300 bg-[#F5F5F5] text-xs text-slate-500">
+            Large robot preview
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {projectCreateRobotOptions.slice(0, 4).map((opt) => (
+              <div key={opt.id} className="h-12 rounded-md border border-slate-200 bg-white" />
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return <p className="text-xs text-slate-500">{t('catalog.preview.undefined')}</p>;
   };
 
   const selectedItem = filteredItems.find((item) => item.id === selectedId) ?? null;
   const pagePreviewPathMap: Record<string, string> = {
     'page.dashboard': '/home',
     'page.list': '/projects',
+    'page.createProjectRobot': '/projects/new',
     'page.detail': '/projects/sample-project',
     'page.workspace': '/projects/pjt-002/workspace',
+    'page.settings': '/projects/pjt-002/workspace/settings',
     'page.work': '/projects/pjt-002/workspace/register',
     'page.form': '/',
   };
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-6 py-8">
+    <main className="mx-auto w-full max-w-[1600px] px-6 py-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Block and Screen Catalog</h1>
-        <p className="mt-1 text-sm text-slate-600">
-          Reusable pattern types and block definitions used by this prototype.
-        </p>
+        <h1 className="text-2xl font-semibold text-slate-900">{t('catalog.title')}</h1>
+        <p className="mt-1 text-sm text-slate-600">{t('catalog.subtitle')}</p>
         <div className="mt-3">
           <Link to="/" className="rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800 hover:bg-slate-50">
-            첫화면으로 이동
+            {t('catalog.linkFirst')}
           </Link>
         </div>
       </header>
 
-      <section className="mb-8 rounded-lg border border-slate-200 bg-white p-4">
+      <section className="mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white p-4">
         <div className="grid gap-4 md:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="rounded-md border border-slate-200 bg-slate-50 p-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">-- {tabLabelMap[sampleTab]}</p>
             <div className="mt-2 flex gap-2">
               {[
-                { key: 'components', label: '컴포넌트' },
-                { key: 'blocks', label: '블록' },
-                { key: 'overlays', label: '오버레이' },
-                { key: 'screenPatterns', label: '화면 패턴' },
+                { key: 'components' as const, label: t('catalog.tab.components') },
+                { key: 'blocks' as const, label: t('catalog.tab.blocks') },
+                { key: 'overlays' as const, label: t('catalog.tab.overlays') },
+                { key: 'screenPatterns' as const, label: t('catalog.tab.screenPatterns') },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -609,8 +908,8 @@ export function CatalogPage(): JSX.Element {
             <input
               value={searchKeyword}
               onChange={(event) => setSearchKeyword(event.target.value)}
-              placeholder="Search..."
-              className="mt-3 h-9 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-800"
+              placeholder={t('catalog.searchPlaceholder')}
+              className={['mt-3', formControlInputClasses].join(' ')}
             />
             <div className="mt-3 max-h-[560px] space-y-1 overflow-y-auto pr-1">
               {filteredItems.map((item) => (
@@ -626,17 +925,17 @@ export function CatalogPage(): JSX.Element {
                   {item.title}
                 </button>
               ))}
-              {filteredItems.length === 0 ? <p className="px-2 py-2 text-xs text-slate-500">검색 결과가 없습니다.</p> : null}
+              {filteredItems.length === 0 ? <p className="px-2 py-2 text-xs text-slate-500">{t('catalog.emptySearch')}</p> : null}
             </div>
           </aside>
 
-          <div>
+          <div className="min-w-0">
             {sampleTab === 'components' && selectedItem?.id.startsWith('component.card') ? (
               <div className="mb-3 rounded-md border border-slate-200 bg-slate-50 p-3">
-                <p className="text-sm font-semibold text-slate-900">Card Variant Guide</p>
+                <p className="text-sm font-semibold text-slate-900">{t('catalog.cardGuide.title')}</p>
                 <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-                  <li>`Card - Project`: 프로젝트 탐색/상세 진입 중심 카드</li>
-                  <li>`Card - Library Asset`: 에셋 메타 정보 스캔/비교 중심 카드</li>
+                  <li>{t('catalog.cardGuide.project')}</li>
+                  <li>{t('catalog.cardGuide.library')}</li>
                 </ul>
               </div>
             ) : null}
@@ -651,7 +950,7 @@ export function CatalogPage(): JSX.Element {
               </SampleCard>
             ) : (
               <div className="rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-500">
-                메뉴에서 항목을 선택하면 상세 미리보기가 표시됩니다.
+                {t('catalog.selectPrompt')}
               </div>
             )}
             {sampleTab === 'screenPatterns' && selectedItem ? (
@@ -666,7 +965,7 @@ export function CatalogPage(): JSX.Element {
                   }}
                   className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
                 >
-                  예시 확인 (전체화면)
+                  {t('catalog.exampleFullscreen')}
                 </button>
               </div>
             ) : null}
@@ -675,16 +974,16 @@ export function CatalogPage(): JSX.Element {
       </section>
 
       <OverlayDialogBlock
-        title="페이지 유형 전체화면 예시"
+        title={t('catalog.fullscreenTitle')}
         isOpen={isPageExampleOpen}
         onClose={() => setIsPageExampleOpen(false)}
-        panelClassName="max-w-6xl"
+        variant="fullscreen"
       >
-        <div className="h-[75vh] overflow-hidden rounded-md border border-slate-200">
+        <div className="flex h-full min-h-0 flex-col overflow-hidden bg-slate-50">
           {pageExamplePath ? (
-            <iframe title="Full screen page example" src={pageExamplePath} className="h-full w-full bg-white" />
+            <iframe title={t('catalog.fullscreenTitle')} src={pageExamplePath} className="h-full min-h-0 w-full flex-1 border-0 bg-white" />
           ) : (
-            <div className="grid h-full place-items-center text-sm text-slate-500">표시할 페이지 예시가 없습니다.</div>
+            <div className="grid flex-1 place-items-center text-sm text-slate-500">{t('catalog.fullscreenEmpty')}</div>
           )}
         </div>
       </OverlayDialogBlock>

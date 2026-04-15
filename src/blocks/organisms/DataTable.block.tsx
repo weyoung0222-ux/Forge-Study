@@ -12,6 +12,8 @@ type Props = {
   emptyText?: string;
   onRowClick?: (row: Record<string, React.ReactNode>, index: number) => void;
   selectedRowIndex?: number | null;
+  /** Emphasize a row (e.g. newly created) on the current page */
+  featuredRowIndex?: number | null;
 };
 
 const alignClass = (align: DataTableColumn['align']): string => {
@@ -26,6 +28,7 @@ export function DataTableBlock({
   emptyText = 'No rows found.',
   onRowClick,
   selectedRowIndex = null,
+  featuredRowIndex = null,
 }: Props): JSX.Element {
   return (
     <div className="overflow-hidden rounded-md border border-slate-200 bg-white">
@@ -64,6 +67,9 @@ export function DataTableBlock({
                   'border-b border-slate-100 last:border-b-0 hover:bg-slate-50/70',
                   onRowClick ? 'cursor-pointer' : '',
                   selectedRowIndex === idx ? 'bg-indigo-50/70' : '',
+                  featuredRowIndex === idx
+                    ? 'bg-amber-50 shadow-[inset_3px_0_0_0_rgb(245,158,11)] ring-1 ring-inset ring-amber-200/90'
+                    : '',
                 ].join(' ')}
               >
                 {columns.map((column) => (

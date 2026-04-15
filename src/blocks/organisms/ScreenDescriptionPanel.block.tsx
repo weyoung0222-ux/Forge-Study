@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { CloseOutlined } from '../../icons';
+
 export type ScreenDescriptionItem = {
   number: number;
   label: string;
@@ -42,9 +44,7 @@ export function ScreenDescriptionPanelBlock({
           className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
           aria-label="기획 패널 닫기"
         >
-          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M5 5l10 10M15 5 5 15" />
-          </svg>
+          <CloseOutlined className="h-4 w-4" />
         </button>
       </div>
 

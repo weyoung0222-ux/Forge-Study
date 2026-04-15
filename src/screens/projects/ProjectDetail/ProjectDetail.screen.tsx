@@ -1,8 +1,10 @@
 import React from 'react';
 
 import { GlobalTopNavBlock } from '../../../blocks/molecules/GlobalTopNav.block';
+import { OverlayDialogBlock } from '../../../blocks/molecules/OverlayDialog.block';
+import { EditProfilePanelBlock } from '../../../blocks/organisms/EditProfilePanel.block';
 import { ProjectMetaInfoStripBlock } from '../../../blocks/molecules/ProjectMetaInfoStrip.block';
-import { ProjectInfoListPanelBlock } from '../../../blocks/organisms/ProjectInfoListPanel.block';
+import { ProjectInfoListPanelBlock, type ProjectInfoListItem } from '../../../blocks/organisms/ProjectInfoListPanel.block';
 import { ProjectOutputSummaryPanelBlock } from '../../../blocks/organisms/ProjectOutputSummaryPanel.block';
 import { ProjectRobotInfoPanelBlock } from '../../../blocks/organisms/ProjectRobotInfoPanel.block';
 import type { ProjectSelectorCardItem } from '../../../blocks/organisms/ProjectSelectorCard.block';
@@ -11,32 +13,39 @@ import { ProjectTaskListBlock } from '../../../blocks/organisms/ProjectTaskList.
 import { ProjectWorkspaceSidebarBlock, type ProjectMemberRole } from '../../../blocks/organisms/ProjectWorkspaceSidebar.block';
 import { ScreenDescriptionPanelBlock } from '../../../blocks/organisms/ScreenDescriptionPanel.block';
 import { projectSelectorRows } from '../../../data-spec/mocks/projectSelector.mock';
+import { useLanguage } from '../../../context/LanguageContext';
 import {
   createGlobalTopNavItems,
   createTemporaryTopUtilityButtons,
-  globalTopNavActions,
   globalTopNavBrandIcon,
+  useGlobalTopNavActions,
 } from '../../../navigation/globalTopNav';
 import { projectDetailUxDescription } from './ProjectDetail.ux';
 
 type Props = {
   projectId: string;
+  currentPath: string;
+  overlayKey?: string;
   onNavigate: (path: string) => void;
 };
+type ProjectDetailOverlayKey = 'project-selector' | 'edit-profile';
 
 type HighlightKey = 'sidebar' | 'header' | 'jobs' | 'activity' | 'robotInfo' | 'output' | 'member';
 
-export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Element {
+export function ProjectDetailScreen({ projectId, currentPath, overlayKey, onNavigate }: Props): JSX.Element {
   const [isUxOpen, setIsUxOpen] = React.useState(false);
   const [highlightedKey, setHighlightedKey] = React.useState<HighlightKey | null>(null);
-  const [isLayoutMenuOpen, setIsLayoutMenuOpen] = React.useState(false);
-  const [isProjectSelectorOpen, setIsProjectSelectorOpen] = React.useState(false);
   const [projectSearch, setProjectSearch] = React.useState('');
   const [selectedProjectId, setSelectedProjectId] = React.useState<string>('PJT-002');
   const [pendingProjectId, setPendingProjectId] = React.useState<string | null>('PJT-002');
+  const [isLayoutMenuOpen, setIsLayoutMenuOpen] = React.useState(false);
+  const layoutMenuRef = React.useRef<HTMLDivElement>(null);
+  const [editProfileDisplayName, setEditProfileDisplayName] = React.useState('');
 
-  const navItems = createGlobalTopNavItems('projects', onNavigate);
-  const utilityButtons = createTemporaryTopUtilityButtons(() => setIsUxOpen(true), () => onNavigate('/'));
+  const { t } = useLanguage();
+  const globalTopNavActions = useGlobalTopNavActions();
+  const navItems = createGlobalTopNavItems('projects', onNavigate, t);
+  const utilityButtons = createTemporaryTopUtilityButtons(() => setIsUxOpen(true), () => onNavigate('/'), t);
   const projectOptions: Array<ProjectSelectorCardItem & { nickname: string; roles: ProjectMemberRole[] }> = projectSelectorRows;
   React.useEffect(() => {
     const resolved =
@@ -49,6 +58,31 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
   const filteredProjectOptions = projectOptions.filter((item) => item.name.toLowerCase().includes(projectSearch.trim().toLowerCase()));
   const currentProject = projectOptions.find((item) => item.id === selectedProjectId) ?? projectOptions[0];
   const activeProjectTitle = currentProject.name;
+
+  const activeOverlay = overlayKey as ProjectDetailOverlayKey | undefined;
+  const isProjectSelectorOpen = activeOverlay === 'project-selector';
+  const isEditProfileOpen = activeOverlay === 'edit-profile';
+
+  React.useEffect(() => {
+    setEditProfileDisplayName(currentProject.nickname);
+  }, [currentProject.nickname, currentProject.id]);
+
+  React.useEffect(() => {
+    if (isEditProfileOpen) setEditProfileDisplayName(currentProject.nickname);
+  }, [isEditProfileOpen, currentProject.nickname]);
+
+  React.useEffect(() => {
+    if (!isLayoutMenuOpen) return;
+    const onDocMouseDown = (event: MouseEvent): void => {
+      if (layoutMenuRef.current && !layoutMenuRef.current.contains(event.target as Node)) {
+        setIsLayoutMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onDocMouseDown);
+    return () => document.removeEventListener('mousedown', onDocMouseDown);
+  }, [isLayoutMenuOpen]);
+  const openOverlay = (nextOverlay: ProjectDetailOverlayKey): void => onNavigate(`${currentPath}?overlay=${nextOverlay}`);
+  const closeOverlay = (): void => onNavigate(currentPath);
 
   const tasks = Array.from({ length: 3 }, (_, index) => ({
     id: `task-${index + 1}`,
@@ -67,11 +101,58 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
     badge: ['Register', 'Collector', 'Trainer', 'Evaluator'][index] ?? 'Register',
   }));
 
-  const memberItems = Array.from({ length: 5 }, (_, index) => ({
-    id: `member-${index + 1}`,
-    title: 'Alex Chen',
-    subtitle: index === 0 ? 'Project Owner' : 'Data Builder / Model Trainer / Evaluator',
-  }));
+  const memberItems: ProjectInfoListItem[] = [
+    {
+      id: 'member-1',
+      title: 'Alex Chen',
+      subtitle: 'alex.chen@company.com',
+      meta: 'Last active · Today',
+      member: {
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=AlexChen&backgroundColor=b6e3f4',
+        roles: ['project owner'],
+      },
+    },
+    {
+      id: 'member-2',
+      title: 'Mina Park',
+      subtitle: 'mina.park@company.com',
+      meta: 'Last active · Yesterday',
+      member: {
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=MinaPark&backgroundColor=c0aede',
+        roles: ['data engineer'],
+      },
+    },
+    {
+      id: 'member-3',
+      title: 'Jordan Lee',
+      subtitle: 'jordan.lee@company.com',
+      meta: 'Last active · 2 days ago',
+      member: {
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=JordanLee&backgroundColor=d1d4f9',
+        roles: ['data engineer', 'model engineer'],
+      },
+    },
+    {
+      id: 'member-4',
+      title: 'Sam Rivera',
+      subtitle: 'sam.rivera@company.com',
+      meta: 'Last active · This week',
+      member: {
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=SamRivera&backgroundColor=ffd5dc',
+        roles: ['model engineer'],
+      },
+    },
+    {
+      id: 'member-5',
+      title: 'Casey Kim',
+      subtitle: 'casey.kim@company.com',
+      meta: 'Last active · This week',
+      member: {
+        avatarUrl: null,
+        roles: ['data engineer'],
+      },
+    },
+  ];
 
   const highlightClass = (key: HighlightKey): string =>
     highlightedKey === key ? 'relative rounded-lg ring-2 ring-indigo-400 ring-offset-2 transition' : '';
@@ -95,15 +176,16 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
                 projectTitle={activeProjectTitle}
                 onProjectTitleClick={() => {
                   setPendingProjectId(selectedProjectId);
-                  setIsProjectSelectorOpen(true);
+                  openOverlay('project-selector');
                 }}
                 items={[
                   { key: 'dashboard', label: 'Dashboard', active: true, onClick: () => onNavigate(`/projects/${selectedProjectId}`) },
                   { key: 'workspace', label: 'Workspace', onClick: () => onNavigate(`/projects/${selectedProjectId}/workspace`) },
-                  { key: 'settings', label: 'Settings' },
+                  { key: 'settings', label: 'Settings', onClick: () => onNavigate(`/projects/${selectedProjectId}/workspace/settings`) },
                 ]}
                 profileName={currentProject.nickname}
                 profileRoles={currentProject.roles}
+                onProfileClick={() => openOverlay('edit-profile')}
               />
             </div>
 
@@ -114,18 +196,36 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
                     <h1 className="text-3xl font-semibold text-slate-900">{activeProjectTitle}</h1>
                     <p className="mt-1 text-sm text-slate-600">{'{Project description}'}</p>
                   </div>
-                  <div className="relative">
+                  <div className="relative" ref={layoutMenuRef}>
                     <button
                       type="button"
-                      onClick={() => setIsLayoutMenuOpen((prev) => !prev)}
+                      onClick={() => setIsLayoutMenuOpen((open) => !open)}
+                      aria-expanded={isLayoutMenuOpen}
                       className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-700 hover:bg-slate-50"
                     >
                       Edit Layout
                     </button>
                     {isLayoutMenuOpen ? (
-                      <div className="absolute right-0 top-8 z-10 w-32 rounded-md border border-slate-200 bg-white p-1 shadow">
-                        <button className="block w-full rounded px-2 py-1.5 text-left text-xs text-slate-700 hover:bg-slate-50">Edit Layout</button>
-                        <button className="block w-full rounded px-2 py-1.5 text-left text-xs text-slate-700 hover:bg-slate-50">Reset Layout</button>
+                      <div
+                        role="menu"
+                        className="absolute right-0 z-20 mt-1 min-w-[11rem] rounded-md border border-slate-200 bg-white py-1 shadow-lg"
+                      >
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => setIsLayoutMenuOpen(false)}
+                          className="block w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          Edit Layout
+                        </button>
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => setIsLayoutMenuOpen(false)}
+                          className="block w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                        >
+                          Reset Layout
+                        </button>
                       </div>
                     ) : null}
                   </div>
@@ -199,15 +299,28 @@ export function ProjectDetailScreen({ projectId, onNavigate }: Props): JSX.Eleme
         items={filteredProjectOptions}
         selectedProjectId={pendingProjectId}
         onSelectProject={setPendingProjectId}
-        onClose={() => setIsProjectSelectorOpen(false)}
+        onClose={closeOverlay}
         onCreateProject={() => onNavigate('/projects/new')}
         onConfirmSelect={() => {
           if (!pendingProjectId) return;
           setSelectedProjectId(pendingProjectId);
-          setIsProjectSelectorOpen(false);
           onNavigate(`/projects/${pendingProjectId}`);
         }}
       />
+
+      <OverlayDialogBlock title="Edit Profile" isOpen={isEditProfileOpen} onClose={closeOverlay} panelClassName="max-w-lg">
+        <EditProfilePanelBlock
+          displayName={editProfileDisplayName}
+          onDisplayNameChange={setEditProfileDisplayName}
+          roles={currentProject.roles}
+          onSave={() => {
+            window.alert('Profile saved (prototype).');
+            closeOverlay();
+          }}
+          onCancel={closeOverlay}
+          onRequestDevRole={(role) => window.alert(`Access request sent: ${role} (prototype).`)}
+        />
+      </OverlayDialogBlock>
     </>
   );
 }

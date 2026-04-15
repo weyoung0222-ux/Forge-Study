@@ -4,12 +4,16 @@
 - Maintain a single unified `Catalog` page for unit exploration and explanation.
 - `Descriptions` route is redirected to `Catalog` and is not maintained separately.
 
+## Component vs block (governance)
+- Blocks are composed of catalog-defined components and shared tokens. See **`docs/policies/component-block-catalog-governance.md`** for rules (chips, forms, mandatory catalog entries).
+- Primitive inventory (buttons, tabs, tokens): **`docs/policies/ui-primitives-inventory.md`**.
+
 ## Single Source of Truth
 - Unit definitions are managed only in `src/descriptions/unitDefinitions.ts`.
 - `Catalog` consumes:
   - `componentUnitItems`
   - `blockUnitItems`
-  - `pageTypeUnitItems`
+  - `screenPatternUnitItems` (화면 패턴 탭)
 
 ## Visibility Rule
 - Show an item only when both conditions are true:

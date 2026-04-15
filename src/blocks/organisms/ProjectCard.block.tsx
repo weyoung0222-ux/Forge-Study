@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { chipBadgeNeutralCompactClasses } from '../styles/chipClasses';
 import type { ProjectCardItem } from '../../data-spec/mocks/projectList.mock';
 
 type Props = {
@@ -27,9 +28,7 @@ export function ProjectCardBlock({ item, onClick }: Props): JSX.Element {
       <div className="p-3">
         <div className="flex items-center gap-1.5">
           <h3 className="m-0 text-lg font-semibold text-slate-900">{item.title}</h3>
-          <span className="rounded-full border border-slate-300 px-2 py-0.5 text-[11px] text-slate-600">
-            {item.role}
-          </span>
+          <span className={chipBadgeNeutralCompactClasses}>{item.role}</span>
         </div>
         <p className="mb-0 mt-2.5 text-sm text-slate-600">{item.description}</p>
       </div>

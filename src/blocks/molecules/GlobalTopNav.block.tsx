@@ -42,11 +42,36 @@ export function GlobalTopNavBlock({
   utilityButtons = [],
 }: Props): JSX.Element {
   const [openActionKey, setOpenActionKey] = React.useState<string | null>(null);
-  const openedAction = actions.find((action) => action.key === openActionKey) ?? null;
+  const navActionsRef = React.useRef<HTMLDivElement>(null);
+  const openedOverlayAction =
+    actions.find((action) => action.key === openActionKey && action.hasPopup && action.surface !== 'popover') ?? null;
+
+  React.useEffect(() => {
+    if (!openActionKey) return;
+    const active = actions.find((a) => a.key === openActionKey);
+    if (active?.surface !== 'popover') return;
+
+    const handleMouseDown = (event: MouseEvent): void => {
+      if (navActionsRef.current?.contains(event.target as Node)) return;
+      setOpenActionKey(null);
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, [openActionKey, actions]);
+
+  React.useEffect(() => {
+    if (!openActionKey) return;
+    const handleEscape = (event: KeyboardEvent): void => {
+      if (event.key === 'Escape') setOpenActionKey(null);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [openActionKey]);
 
   return (
     <>
-      <header className="h-14 border-b border-slate-200 bg-white">
+      <header className="sticky top-0 z-50 h-14 border-b border-slate-200 bg-white">
         <div className="flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-10">
             <button type="button" onClick={onBrandClick} className="flex items-center gap-2 bg-transparent">
@@ -82,44 +107,57 @@ export function GlobalTopNavBlock({
                 {button.label}
               </button>
             ))}
-            {actions.map((action) => {
-              const isOpen = openActionKey === action.key;
+            <div ref={navActionsRef} className="flex items-center gap-2">
+              {actions.map((action) => {
+                const isOpen = openActionKey === action.key;
+                const usePopover = Boolean(action.hasPopup && action.surface === 'popover');
 
-              return (
-                <button
-                  key={action.key}
-                  type="button"
-                  title={action.label}
-                  aria-label={action.label}
-                  aria-haspopup={action.hasPopup ? 'dialog' : undefined}
-                  aria-expanded={action.hasPopup ? isOpen : undefined}
-                  onClick={() => {
-                    action.onClick?.();
-                    if (action.hasPopup) {
-                      setOpenActionKey((current) => (current === action.key ? null : action.key));
-                    }
-                  }}
-                  className={[
-                    'rounded-md p-1.5 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900',
-                    isOpen ? 'bg-slate-100 text-slate-900' : '',
-                  ].join(' ')}
-                >
-                  {action.icon}
-                </button>
-              );
-            })}
+                return (
+                  <div key={action.key} className={usePopover ? 'relative' : 'inline-flex items-center'}>
+                    <button
+                      type="button"
+                      title={action.label}
+                      aria-label={action.label}
+                      aria-haspopup={action.hasPopup ? (usePopover ? 'true' : 'dialog') : undefined}
+                      aria-expanded={action.hasPopup ? isOpen : undefined}
+                      onClick={() => {
+                        action.onClick?.();
+                        if (action.hasPopup) {
+                          setOpenActionKey((current) => (current === action.key ? null : action.key));
+                        }
+                      }}
+                      className={[
+                        'flex items-center justify-center rounded-md p-1.5 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900',
+                        isOpen ? 'bg-slate-100 text-slate-900' : '',
+                      ].join(' ')}
+                    >
+                      {action.icon}
+                    </button>
+                    {usePopover && isOpen ? (
+                      <div
+                        role="dialog"
+                        aria-label={action.label}
+                        className="absolute right-0 top-[calc(100%+6px)] z-[60] w-56 rounded-lg border border-slate-200 bg-white p-3 shadow-lg"
+                      >
+                        {action.popupContent}
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </header>
 
       <OverlayDialogBlock
-        title={openedAction?.label ?? 'Menu'}
-        isOpen={Boolean(openedAction)}
+        title={openedOverlayAction?.label ?? 'Menu'}
+        isOpen={Boolean(openedOverlayAction)}
         onClose={() => setOpenActionKey(null)}
       >
-        {openedAction?.popupContent ?? (
+        {openedOverlayAction?.popupContent ?? (
           <div className="text-sm text-slate-600">
-            <p className="font-semibold text-slate-900">{openedAction?.label ?? 'Menu'}</p>
+            <p className="font-semibold text-slate-900">{openedOverlayAction?.label ?? 'Menu'}</p>
             <p className="mt-1">Overlay placeholder</p>
           </div>
         )}

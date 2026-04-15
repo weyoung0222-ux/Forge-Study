@@ -1,5 +1,9 @@
 import React from 'react';
 
+import { CloseOutlined, PlusOutlined, SearchOutlined } from '../../icons';
+import { buttonIconGhostClasses, buttonPrimaryLgFullWidthClasses, buttonPrimaryMdClasses } from '../styles/buttonClasses';
+import { chipTitleInlineCountClasses } from '../styles/chipClasses';
+import { formControlInputWithIconClasses } from '../styles/formFieldClasses';
 import { ProjectSelectorCardBlock, type ProjectSelectorCardItem } from './ProjectSelectorCard.block';
 
 type Props = {
@@ -38,12 +42,10 @@ export function ProjectSelectorPanelBlock({
       <aside className="relative h-[520px] w-full max-w-[520px] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-slate-900">
-            {title} <span className="rounded-full border border-slate-300 px-2 py-0.5 align-middle text-xs text-slate-500">{count}</span>
+            {title} <span className={['align-middle', chipTitleInlineCountClasses].join(' ')}>{count}</span>
           </h2>
-          <button type="button" onClick={onClose} className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close panel">
-            <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M5 5l10 10M15 5 5 15" />
-            </svg>
+          <button type="button" onClick={onClose} className={buttonIconGhostClasses} aria-label="Close panel">
+            <CloseOutlined className="h-5 w-5" />
           </button>
         </div>
 
@@ -53,19 +55,17 @@ export function ProjectSelectorPanelBlock({
               value={searchValue}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search"
-              className="h-10 w-full rounded-md border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-800"
+              className={formControlInputWithIconClasses}
             />
-            <svg viewBox="0 0 20 20" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <circle cx="9" cy="9" r="5.5" />
-              <path d="m13 13 4 4" />
-            </svg>
+            <SearchOutlined className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           </div>
           <button
             type="button"
             onClick={onCreateProject}
-            className="h-10 rounded-md bg-slate-900 px-3 text-sm font-semibold text-white hover:bg-slate-800"
+            className={[buttonPrimaryMdClasses, 'inline-flex items-center gap-1'].join(' ')}
           >
-            + New Project
+            <PlusOutlined />
+            New Project
           </button>
         </div>
 
@@ -86,10 +86,7 @@ export function ProjectSelectorPanelBlock({
           type="button"
           onClick={onConfirmSelect}
           disabled={!selectedProjectId}
-          className={[
-            'mt-3 h-11 w-full rounded-md text-base font-semibold',
-            selectedProjectId ? 'bg-slate-900 text-white hover:bg-slate-800' : 'bg-slate-200 text-slate-500',
-          ].join(' ')}
+          className={['mt-3', buttonPrimaryLgFullWidthClasses].join(' ')}
         >
           Select
         </button>
@@ -108,12 +105,10 @@ export function ProjectSelectorPanelBlock({
       >
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-slate-900">
-            {title} <span className="rounded-full border border-slate-300 px-2 py-0.5 align-middle text-xs text-slate-500">{count}</span>
+            {title} <span className={['align-middle', chipTitleInlineCountClasses].join(' ')}>{count}</span>
           </h2>
-          <button type="button" onClick={onClose} className="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close panel">
-            <svg viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M5 5l10 10M15 5 5 15" />
-            </svg>
+          <button type="button" onClick={onClose} className={buttonIconGhostClasses} aria-label="Close panel">
+            <CloseOutlined className="h-5 w-5" />
           </button>
         </div>
 
@@ -123,19 +118,17 @@ export function ProjectSelectorPanelBlock({
               value={searchValue}
               onChange={(event) => onSearchChange(event.target.value)}
               placeholder="Search"
-              className="h-10 w-full rounded-md border border-slate-300 bg-white pl-9 pr-3 text-sm text-slate-800"
+              className={formControlInputWithIconClasses}
             />
-            <svg viewBox="0 0 20 20" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <circle cx="9" cy="9" r="5.5" />
-              <path d="m13 13 4 4" />
-            </svg>
+            <SearchOutlined className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           </div>
           <button
             type="button"
             onClick={onCreateProject}
-            className="h-10 rounded-md bg-slate-900 px-3 text-sm font-semibold text-white hover:bg-slate-800"
+            className={[buttonPrimaryMdClasses, 'inline-flex items-center gap-1'].join(' ')}
           >
-            + New Project
+            <PlusOutlined />
+            New Project
           </button>
         </div>
 
@@ -156,10 +149,7 @@ export function ProjectSelectorPanelBlock({
           type="button"
           onClick={onConfirmSelect}
           disabled={!selectedProjectId}
-          className={[
-            'mt-3 h-11 w-full rounded-md text-base font-semibold',
-            selectedProjectId ? 'bg-slate-900 text-white hover:bg-slate-800' : 'bg-slate-200 text-slate-500',
-          ].join(' ')}
+          className={['mt-3', buttonPrimaryLgFullWidthClasses].join(' ')}
         >
           Select
         </button>

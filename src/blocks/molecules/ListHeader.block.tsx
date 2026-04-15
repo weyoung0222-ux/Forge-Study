@@ -1,5 +1,8 @@
 import React from 'react';
 
+import { PlusOutlined } from '../../icons';
+import { buttonSecondaryMdClasses } from '../styles/buttonClasses';
+
 type HeaderAction = {
   label: string;
   onClick: () => void;
@@ -22,9 +25,10 @@ export function ListHeaderBlock({ title, subtitle, primaryAction }: Props): JSX.
         <button
           type="button"
           onClick={primaryAction.onClick}
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50"
+          className={[buttonSecondaryMdClasses, 'inline-flex items-center gap-1.5'].join(' ')}
         >
-          + {primaryAction.label}
+          <PlusOutlined />
+          {primaryAction.label}
         </button>
       ) : null}
     </section>

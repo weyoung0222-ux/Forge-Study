@@ -1,107 +1,114 @@
 import React from 'react';
 
+import { type TranslateFn, useLanguage } from '../context/LanguageContext';
 import type { TopNavAction, TopNavItem, TopNavUtilityButton } from '../blocks/molecules/GlobalTopNav.block';
+import { AppstoreOutlined, BellOutlined, GlobalOutlined, SettingOutlined, SoundOutlined } from '../icons';
 
 export type GlobalTopNavKey = 'home' | 'projects' | 'library';
 
-export const globalTopNavBrandIcon = (
-  <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor" aria-hidden>
-    <rect x="2.5" y="2.5" width="6.5" height="6.5" rx="1.2" />
-    <rect x="11" y="2.5" width="6.5" height="6.5" rx="1.2" />
-    <rect x="2.5" y="11" width="6.5" height="6.5" rx="1.2" />
-    <rect x="11" y="11" width="6.5" height="6.5" rx="1.2" />
-  </svg>
-);
+const iconBtnClass = 'text-lg leading-none text-slate-600';
 
-export const globalTopNavActions: TopNavAction[] = [
-  {
-    key: 'notifications',
-    label: 'Notifications',
-    hasPopup: true,
-    icon: (
-      <svg
-        viewBox="0 0 20 20"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M10 3.5a4.8 4.8 0 0 0-4.8 4.8v2.2L4 12.8h12l-1.2-2.3V8.3A4.8 4.8 0 0 0 10 3.5Z" />
-        <path d="M8.3 14.6a1.7 1.7 0 0 0 3.4 0" />
-      </svg>
-    ),
-    popupContent: (
-      <div className="text-sm">
-        <p className="font-semibold text-slate-900">Notifications</p>
-        <p className="mt-1 text-slate-600">No new notifications right now.</p>
-      </div>
-    ),
-  },
-  {
-    key: 'settings',
-    label: 'Settings',
-    hasPopup: true,
-    icon: (
-      <svg
-        viewBox="0 0 20 20"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="10" cy="10" r="2.7" />
-        <path d="M10 2.8v1.9M10 15.3v1.9M2.8 10h1.9M15.3 10h1.9M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4" />
-      </svg>
-    ),
-    popupContent: (
-      <div className="text-sm">
-        <p className="font-semibold text-slate-900">Settings</p>
-        <p className="mt-1 text-slate-600">Theme, language, and preference controls.</p>
-      </div>
-    ),
-  },
-  {
-    key: 'announcements',
-    label: 'Announcements',
-    hasPopup: true,
-    icon: (
-      <svg
-        viewBox="0 0 20 20"
-        className="h-5 w-5"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M3.5 10.8V8.7c0-.5.4-.9.9-.9h1.6l5.3-2.9a1 1 0 0 1 1.5.9v8.4a1 1 0 0 1-1.5.9l-5.3-2.9H4.4a.9.9 0 0 1-.9-.9Z" />
-        <path d="M13.7 7.2c1 .5 1.6 1.6 1.6 2.8s-.6 2.3-1.6 2.8" />
-        <path d="M6 12.1 7 15a.9.9 0 0 0 .8.6h.8" />
-      </svg>
-    ),
-    popupContent: (
-      <div className="text-sm">
-        <p className="font-semibold text-slate-900">Announcements</p>
-        <p className="mt-1 text-slate-600">Product notices and release updates.</p>
-      </div>
-    ),
-  },
-];
+export const globalTopNavBrandIcon = <AppstoreOutlined className="h-4 w-4 text-slate-900" aria-hidden />;
 
-export function createGlobalTopNavItems(activeKey: GlobalTopNavKey, onNavigate: (path: string) => void): TopNavItem[] {
-  const defs: Array<{ key: GlobalTopNavKey; label: string; path: string }> = [
-    { key: 'home', label: 'Home', path: '/home' },
-    { key: 'projects', label: 'Projects', path: '/projects' },
-    { key: 'library', label: 'Library', path: '/library' },
+function LanguagePopoverBody(): JSX.Element {
+  const { locale, setLocale, t } = useLanguage();
+
+  return (
+    <div role="radiogroup" aria-label={t('gnb.language')} className="space-y-2.5">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('gnb.popup.languageSection')}</p>
+      <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+        <input
+          type="radio"
+          name="gnb-interface-language"
+          className="h-4 w-4 border-slate-300 text-slate-900 focus:ring-slate-400"
+          checked={locale === 'en'}
+          onChange={() => setLocale('en')}
+        />
+        {t('language.radio.en')}
+      </label>
+      <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+        <input
+          type="radio"
+          name="gnb-interface-language"
+          className="h-4 w-4 border-slate-300 text-slate-900 focus:ring-slate-400"
+          checked={locale === 'ko'}
+          onChange={() => setLocale('ko')}
+        />
+        {t('language.radio.ko')}
+      </label>
+    </div>
+  );
+}
+
+/** 우측 순서: Language → Notifications → Announcements → Settings — `useLanguage` 필요 */
+export function useGlobalTopNavActions(): TopNavAction[] {
+  const { t } = useLanguage();
+
+  return React.useMemo(
+    (): TopNavAction[] => [
+      {
+        key: 'language',
+        label: t('gnb.language'),
+        hasPopup: true,
+        surface: 'popover',
+        icon: <GlobalOutlined className={iconBtnClass} />,
+        popupContent: <LanguagePopoverBody />,
+      },
+      {
+        key: 'notifications',
+        label: t('gnb.notifications'),
+        hasPopup: true,
+        icon: <BellOutlined className={iconBtnClass} />,
+        popupContent: (
+          <div className="text-sm">
+            <p className="font-semibold text-slate-900">{t('gnb.popup.notificationsTitle')}</p>
+            <p className="mt-1 text-slate-600">{t('gnb.popup.notificationsBody')}</p>
+          </div>
+        ),
+      },
+      {
+        key: 'announcements',
+        label: t('gnb.announcements'),
+        hasPopup: true,
+        icon: <SoundOutlined className={iconBtnClass} />,
+        popupContent: (
+          <div className="text-sm">
+            <p className="font-semibold text-slate-900">{t('gnb.popup.announcementsTitle')}</p>
+            <p className="mt-1 text-slate-600">{t('gnb.popup.announcementsBody')}</p>
+          </div>
+        ),
+      },
+      {
+        key: 'settings',
+        label: t('gnb.settings'),
+        hasPopup: true,
+        icon: <SettingOutlined className={iconBtnClass} />,
+        popupContent: (
+          <div className="text-sm">
+            <p className="font-semibold text-slate-900">{t('gnb.popup.settingsTitle')}</p>
+            <p className="mt-1 text-slate-600">{t('gnb.popup.settingsBody')}</p>
+          </div>
+        ),
+      },
+    ],
+    [t],
+  );
+}
+
+export function createGlobalTopNavItems(
+  activeKey: GlobalTopNavKey,
+  onNavigate: (path: string) => void,
+  t: TranslateFn,
+): TopNavItem[] {
+  const defs: Array<{ key: GlobalTopNavKey; labelKey: string; path: string }> = [
+    { key: 'home', labelKey: 'nav.home', path: '/home' },
+    { key: 'projects', labelKey: 'nav.projects', path: '/projects' },
+    { key: 'library', labelKey: 'nav.library', path: '/library' },
   ];
 
   return defs.map((item) => ({
     key: item.key,
-    label: item.label,
+    label: t(item.labelKey),
     active: item.key === activeKey,
     onClick: () => onNavigate(item.path),
   }));
@@ -110,9 +117,10 @@ export function createGlobalTopNavItems(activeKey: GlobalTopNavKey, onNavigate: 
 export function createTemporaryTopUtilityButtons(
   onDescriptionClick: () => void,
   onLogoutClick: () => void,
+  t: TranslateFn,
 ): TopNavUtilityButton[] {
   return [
-    { key: 'description-temp', label: 'Description (Temp)', onClick: onDescriptionClick },
-    { key: 'logout-temp', label: 'Logout (Temp)', onClick: onLogoutClick },
+    { key: 'description-temp', label: t('utility.description'), onClick: onDescriptionClick },
+    { key: 'logout-temp', label: t('utility.logout'), onClick: onLogoutClick },
   ];
 }

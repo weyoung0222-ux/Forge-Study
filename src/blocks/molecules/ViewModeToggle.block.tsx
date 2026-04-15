@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { AppstoreOutlined, UnorderedListOutlined } from '../../icons';
+
 export type ViewMode = 'list' | 'grid';
 
 type Props = {
@@ -20,9 +22,7 @@ export function ViewModeToggleBlock({ value, onChange }: Props): JSX.Element {
           value === 'list' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100',
         ].join(' ')}
       >
-        <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M4 5.5h12M4 10h12M4 14.5h12" strokeLinecap="round" />
-        </svg>
+        <UnorderedListOutlined className="h-4 w-4" />
       </button>
       <button
         type="button"
@@ -34,12 +34,7 @@ export function ViewModeToggleBlock({ value, onChange }: Props): JSX.Element {
           value === 'grid' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100',
         ].join(' ')}
       >
-        <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor">
-          <rect x="3.5" y="3.5" width="5.5" height="5.5" rx="1" />
-          <rect x="11" y="3.5" width="5.5" height="5.5" rx="1" />
-          <rect x="3.5" y="11" width="5.5" height="5.5" rx="1" />
-          <rect x="11" y="11" width="5.5" height="5.5" rx="1" />
-        </svg>
+        <AppstoreOutlined className="h-4 w-4" />
       </button>
     </div>
   );

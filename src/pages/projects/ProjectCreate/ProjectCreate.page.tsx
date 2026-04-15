@@ -1,10 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { ProjectCreateScreen } from '../../../screens/projects/ProjectCreate/ProjectCreate.screen';
 
 export function ProjectCreatePage(): JSX.Element {
-  return (
-    <main style={{ padding: 24, fontFamily: 'sans-serif' }}>
-      <h1>Create Project</h1>
-      <p>This is a placeholder page for project creation routing.</p>
-    </main>
-  );
+  const navigate = useNavigate();
+  return <ProjectCreateScreen onNavigate={(path, options) => navigate(path, options)} />;
 }
