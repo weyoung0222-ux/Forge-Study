@@ -2,6 +2,8 @@ import React from 'react';
 
 import { type TranslateFn, useLanguage } from '../context/LanguageContext';
 import type { TopNavAction, TopNavItem, TopNavUtilityButton } from '../blocks/molecules/GlobalTopNav.block';
+import { GlobalNavSettingsPanelBlock } from '../blocks/organisms/GlobalNavSettingsPanel.block';
+import { captureAppRootToPngDownload } from '../utils/captureAppViewport';
 import { AppstoreOutlined, BellOutlined, GlobalOutlined, SettingOutlined, SoundOutlined } from '../icons';
 
 export type GlobalTopNavKey = 'home' | 'projects' | 'library';
@@ -83,12 +85,8 @@ export function useGlobalTopNavActions(): TopNavAction[] {
         label: t('gnb.settings'),
         hasPopup: true,
         icon: <SettingOutlined className={iconBtnClass} />,
-        popupContent: (
-          <div className="text-sm">
-            <p className="font-semibold text-slate-900">{t('gnb.popup.settingsTitle')}</p>
-            <p className="mt-1 text-slate-600">{t('gnb.popup.settingsBody')}</p>
-          </div>
-        ),
+        overlayPanelMaxWidthClass: 'max-w-4xl',
+        popupContent: <GlobalNavSettingsPanelBlock />,
       },
     ],
     [t],
@@ -120,6 +118,15 @@ export function createTemporaryTopUtilityButtons(
   t: TranslateFn,
 ): TopNavUtilityButton[] {
   return [
+    {
+      key: 'capture-screen-temp',
+      label: t('utility.captureScreen'),
+      onClick: () => {
+        void captureAppRootToPngDownload().catch((err: unknown) => {
+          console.error('Screen capture failed', err);
+        });
+      },
+    },
     { key: 'description-temp', label: t('utility.description'), onClick: onDescriptionClick },
     { key: 'logout-temp', label: t('utility.logout'), onClick: onLogoutClick },
   ];

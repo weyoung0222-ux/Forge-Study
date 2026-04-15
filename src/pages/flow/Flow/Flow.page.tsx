@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../../context/LanguageContext';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 import { iaItems, type Domain, type IaItem } from '../../../data-spec/ia/screenList.ia';
 
 type IaRow = IaItem & {
@@ -306,7 +307,8 @@ export function FlowPage(): JSX.Element {
     ));
 
   return (
-    <main className="mx-auto w-full max-w-[1600px] px-6 py-8">
+    <main className="min-h-screen bg-white py-8">
+      <div className={appShellInnerClass}>
       <header className="mb-6">
         <h1 className="text-2xl font-semibold text-slate-900">{t('flow.title')}</h1>
         <p className="mt-1 text-sm text-slate-600">{t('flow.subtitle')}</p>
@@ -348,6 +350,7 @@ export function FlowPage(): JSX.Element {
           </table>
         </div>
       </section>
+      </div>
     </main>
   );
 }

@@ -4,6 +4,7 @@ import { GlobalTopNavBlock } from '../../../blocks/molecules/GlobalTopNav.block'
 import { ListHeaderBlock } from '../../../blocks/molecules/ListHeader.block';
 import { getRobotOptionById } from '../../../data-spec/mocks/projectCreateRobots.mock';
 import { useLanguage } from '../../../context/LanguageContext';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 import { ArrowLeftOutlined } from '../../../icons';
 import {
   createGlobalTopNavItems,
@@ -36,7 +37,8 @@ export function ProjectCreateDetailsScreen({ robotId, onNavigate }: Props): JSX.
         utilityButtons={utilityButtons}
         actions={globalTopNavActions}
       />
-      <div className="mx-auto max-w-3xl px-4 py-6">
+      <div className={[appShellInnerClass, 'py-6'].join(' ')}>
+        <div className="mx-auto max-w-3xl">
         <button
           type="button"
           onClick={() => onNavigate('/projects/new')}
@@ -60,6 +62,7 @@ export function ProjectCreateDetailsScreen({ robotId, onNavigate }: Props): JSX.
           <p className="mt-2 text-sm text-slate-600">
             State: <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">robotId = {robotId ?? '—'}</code>
           </p>
+        </div>
         </div>
       </div>
     </main>

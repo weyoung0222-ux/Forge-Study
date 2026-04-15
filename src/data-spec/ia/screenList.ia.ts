@@ -164,6 +164,21 @@ export const iaItems: IaItem[] = [
     path: '/projects/:projectId/workspace/generator',
   },
   {
+    key: 'dev-work-generator-idm',
+    domain: 'Dev',
+    depth1: 'Project',
+    depth2: 'Project List',
+    depth3: 'Workspace',
+    depth4: 'Data Foundry',
+    depth5: 'Generate IDM',
+    screenName: 'Generate — IDM trajectory',
+    description:
+      'Generate 서브플로 generateMode=idm — IDM 모델 선택, 입력 영상(업로드 또는 데이터셋 클립), 궤적을 영상에 합성 후 pre-processor로 진행',
+    type: 'Page',
+    path: '/projects/:projectId/workspace/generator?generateMode=idm',
+    linkedToKey: 'dev-workspace-data-foundry',
+  },
+  {
     key: 'dev-work-curator',
     domain: 'Dev',
     depth1: 'Project',

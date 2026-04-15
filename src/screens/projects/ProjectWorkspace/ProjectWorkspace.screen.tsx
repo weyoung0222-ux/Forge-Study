@@ -16,6 +16,10 @@ import { ActivitySaveDatasetBlock } from '../../../blocks/organisms/ActivitySave
 import { ActivityValidationBlock } from '../../../blocks/organisms/ActivityValidation.block';
 import { WorkPageShellBlock, type WorkFlowStep } from '../../../blocks/organisms/WorkPageShell.block';
 import { CollectTeleoperationStepBlock } from '../../../blocks/organisms/CollectTeleoperationStep.block';
+import { CurateAnalyticsStepBlock } from '../../../blocks/organisms/CurateAnalyticsStep.block';
+import { MergeDatasetsStepBlock } from '../../../blocks/organisms/MergeDatasetsStep.block';
+import { IdmTrajectoryStepBlock, type IdmDatasetClipOption } from '../../../blocks/organisms/IdmTrajectoryStep.block';
+import { MimicAugmentationStepBlock } from '../../../blocks/organisms/MimicAugmentationStep.block';
 import { SyntheticVideoCreationStepBlock } from '../../../blocks/organisms/SyntheticVideoCreationStep.block';
 import { WorkPageTemplateCanvasBlock, type WorkPageTemplateVariant } from '../../../blocks/organisms/WorkPageTemplateCanvas.block';
 import { ProjectSelectorPanelBlock } from '../../../blocks/organisms/ProjectSelectorPanel.block';
@@ -35,8 +39,10 @@ import { activityDraftSessionsMock, createActivityDraftSnapshot } from '../../..
 import { getActivitySaveSummary, getDefaultSaveDraft } from '../../../data-spec/mocks/activitySaveDataset.mock';
 import { getPreprocessorRecordCountForActivity } from '../../../data-spec/mocks/activityWorkflowCounts.mock';
 import { workspaceJobsOnProcessRows } from '../../../data-spec/mocks/workspaceJobs.mock';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 import { useLanguage } from '../../../context/LanguageContext';
 import { uiTitleCase } from '../../../utils/titleCase';
+import { getWorkspaceTabVisibility } from '../../../utils/workspaceTabVisibility';
 import {
   createGlobalTopNavItems,
   createTemporaryTopUtilityButtons,
@@ -52,6 +58,8 @@ type Props = {
   workKey?: string;
   /** Query `generateMode` when opening Generate (synthetic-video | mimic-augmentation | idm) */
   generateMode?: string;
+  /** Query `curateMode` when opening Curate (merge-datasets | analytics) */
+  curateMode?: string;
   /** Current route pathname (no query), e.g. /projects/PJT/workspace/generator */
   workspacePathname: string;
   /** Current route search including `?`, e.g. ?generateMode=synthetic-video — required to open overlays without dropping sub-flow */
@@ -75,6 +83,8 @@ type WorkspaceTab = 'dataFoundry' | 'modelInstitute';
 type WorkspaceDatasetRow = {
   id: string;
   sourceType: LibrarySource;
+  /** Data Foundry Saved Datasets only — see `DATA_FOUNDRY_DATA_KINDS`. */
+  dataKind?: string;
   no: string;
   name: string;
   version: string;
@@ -88,6 +98,41 @@ const workspaceActivityKeys: WorkspaceActivityKey[] = ['register', 'collector', 
 
 /** Data Foundry 산출물 — Source policy: register, collector, generator, curator */
 const DATA_FOUNDRY_SOURCES: Exclude<LibrarySource, 'all'>[] = ['register', 'collector', 'generator', 'curator'];
+
+/** Saved Datasets (Data Foundry) — logical payload type; values are UI labels. */
+const DATA_FOUNDRY_DATA_KINDS = [
+  'Dataset',
+  'Video',
+  'Episode',
+  'Trajectory',
+  'Point cloud',
+  'Simulation rollout',
+  'Annotations',
+  'Mesh',
+  'Segmentation mask',
+  'Audio',
+  'IMU trace',
+  'Multimodal bundle',
+  'HDF5 shard',
+  'Parquet table',
+  'Calibration bundle',
+  'Embeddings',
+] as const;
+
+function defaultDataKindForSavedDataset(activity: WorkspaceActivityKey): string {
+  switch (activity) {
+    case 'register':
+      return 'Dataset';
+    case 'collector':
+      return 'Episode';
+    case 'generator':
+      return 'Video';
+    case 'curator':
+      return 'Dataset';
+    default:
+      return 'Dataset';
+  }
+}
 /** Model Institute 산출물 — Source policy: trainer, evaluator */
 const MODEL_INSTITUTE_SOURCES: Exclude<LibrarySource, 'all'>[] = ['trainer', 'evaluator'];
 
@@ -116,9 +161,20 @@ const GENERATE_ACTIVITY_MENU_OPTIONS = [
   { id: 'idm', label: 'IDM' },
 ] as const;
 
+const CURATE_ACTIVITY_MENU_OPTIONS = [
+  { id: 'merge-datasets', label: 'Merge datasets' },
+  { id: 'analytics', label: 'Analytics' },
+] as const;
+
 function resolveGenerateModeLabel(raw: string | undefined): string | null {
   if (!raw) return null;
   const found = GENERATE_ACTIVITY_MENU_OPTIONS.find((o) => o.id === raw);
+  return found ? found.label : null;
+}
+
+function resolveCurateModeLabel(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const found = CURATE_ACTIVITY_MENU_OPTIONS.find((o) => o.id === raw);
   return found ? found.label : null;
 }
 
@@ -128,6 +184,7 @@ function createInitialDataFoundrySavedRows(): WorkspaceDatasetRow[] {
     return {
       id: `df-dataset-${index + 1}`,
       sourceType: source,
+      dataKind: DATA_FOUNDRY_DATA_KINDS[index % DATA_FOUNDRY_DATA_KINDS.length],
       no: String(index + 1),
       name: `Warehouse Scenarios Collection - Run #${112 + index}`,
       version: index % 3 === 0 ? 'v1.0' : 'v0.9',
@@ -160,6 +217,7 @@ export function ProjectWorkspaceScreen({
   projectId,
   workKey,
   generateMode,
+  curateMode,
   workspacePathname,
   workspaceSearch,
   overlayKey,
@@ -217,6 +275,25 @@ export function ProjectWorkspaceScreen({
   const currentProject = projectOptions.find((item) => item.id === selectedProjectId) ?? projectOptions[0];
   const activeProjectTitle = currentProject.name;
 
+  const workspaceTabVisibility = React.useMemo(
+    () => getWorkspaceTabVisibility(currentProject.roles),
+    [currentProject.roles],
+  );
+
+  const workspaceDomainTabItems = React.useMemo(
+    () =>
+      workspaceTabVisibility.visibleTabs.map((value) => ({
+        value,
+        label: value === 'dataFoundry' ? t('workspace.tab.dataFoundry') : t('workspace.tab.modelInstitute'),
+      })),
+    [workspaceTabVisibility.visibleTabs, t],
+  );
+
+  React.useEffect(() => {
+    const { visibleTabs, defaultTab } = getWorkspaceTabVisibility(currentProject.roles);
+    setWorkspaceTab((prev) => (visibleTabs.includes(prev) ? prev : defaultTab));
+  }, [selectedProjectId, currentProject.roles]);
+
   React.useEffect(() => {
     setEditProfileDisplayName(currentProject.nickname);
   }, [currentProject.nickname, currentProject.id]);
@@ -249,13 +326,78 @@ export function ProjectWorkspaceScreen({
   const activeWorkPageActivity = isWorkspaceActivityKey(workKey) ? workKey : null;
   const generateModeLabel =
     activeWorkPageActivity === 'generator' ? resolveGenerateModeLabel(generateMode) : null;
+  const curateModeLabel = activeWorkPageActivity === 'curator' ? resolveCurateModeLabel(curateMode) : null;
+
+  const dedicatedGeneratorStep1Modes = React.useMemo(
+    () => new Set(['synthetic-video', 'mimic-augmentation', 'idm']),
+    [],
+  );
+  const isDedicatedGeneratorStep1 =
+    activeWorkPageActivity === 'generator' && generateMode !== undefined && dedicatedGeneratorStep1Modes.has(generateMode);
+
+  const dedicatedCuratorStep1Modes = React.useMemo(() => new Set(['merge-datasets', 'analytics']), []);
+  const isDedicatedCuratorStep1 =
+    activeWorkPageActivity === 'curator' && curateMode !== undefined && dedicatedCuratorStep1Modes.has(curateMode);
+
+  const mergeDatasetPickRows = React.useMemo(
+    () =>
+      dataFoundrySavedRowsState.map((r) => ({
+        id: r.id,
+        no: r.no,
+        name: r.name,
+        version: r.version,
+        sourceType: r.sourceType,
+        time: r.time,
+        worker: r.worker,
+      })),
+    [dataFoundrySavedRowsState],
+  );
+
+  const idmDatasetClipOptions = React.useMemo((): IdmDatasetClipOption[] => {
+    return dataFoundrySavedRowsState.slice(0, 12).map((r, index) => ({
+      datasetId: r.id,
+      datasetName: r.name,
+      clipId: `clip-${r.id}-${index}`,
+      clipLabel: `Episode ${Number(r.no) * 3 + index} · workspace clip`,
+      durationSec: 32 + (index % 7) * 6,
+      sourceLabel: SOURCE_FILTER_LABEL[r.sourceType as keyof typeof SOURCE_FILTER_LABEL],
+    }));
+  }, [dataFoundrySavedRowsState]);
+
+  const workPageStepLabels = React.useMemo((): [string, string, string] | undefined => {
+    if (activeWorkPageActivity === 'collector') {
+      return ['teleoperation', 'pre-processor', 'save datasets'];
+    }
+    if (activeWorkPageActivity === 'generator') {
+      if (generateMode === 'synthetic-video') {
+        return ['synthetic video generation', 'pre-processor', 'save datasets'];
+      }
+      if (generateMode === 'mimic-augmentation') {
+        return ['mimic augmentation', 'pre-processor', 'save datasets'];
+      }
+      if (generateMode === 'idm') {
+        return ['idm trajectory', 'pre-processor', 'save datasets'];
+      }
+    }
+    if (activeWorkPageActivity === 'curator') {
+      if (curateMode === 'merge-datasets') {
+        return ['merge datasets', 'pre-processor', 'save datasets'];
+      }
+      if (curateMode === 'analytics') {
+        return ['analytics', 'pre-processor', 'save datasets'];
+      }
+    }
+    return undefined;
+  }, [activeWorkPageActivity, generateMode, curateMode]);
 
   const workShellTitle =
     activeWorkPageActivity && generateModeLabel
       ? generateModeLabel
-      : activeWorkPageActivity
-        ? workPageConfigMap[activeWorkPageActivity].title
-        : 'Work Page';
+      : activeWorkPageActivity && curateModeLabel
+        ? curateModeLabel
+        : activeWorkPageActivity
+          ? workPageConfigMap[activeWorkPageActivity].title
+          : 'Work Page';
 
   const draftsForCurrentActivity = React.useMemo(() => {
     if (!activeWorkPageActivity) return [];
@@ -264,8 +406,12 @@ export function ProjectWorkspaceScreen({
       const modeNorm = (generateMode ?? '').trim();
       list = list.filter((d) => (d.generateMode ?? '').trim() === modeNorm);
     }
+    if (activeWorkPageActivity === 'curator') {
+      const modeNorm = (curateMode ?? '').trim();
+      list = list.filter((d) => (d.curateMode ?? '').trim() === modeNorm);
+    }
     return list;
-  }, [activityDraftSessions, activeWorkPageActivity, generateMode]);
+  }, [activityDraftSessions, activeWorkPageActivity, generateMode, curateMode]);
 
   const isJobsDrawerOpen = overlayKey === 'jobs-on-process';
   const openJobsDrawer = (): void =>
@@ -280,9 +426,15 @@ export function ProjectWorkspaceScreen({
 
   const handleSelectActivityDraft = (draft: ActivityDraftSession): void => {
     draftRestoreAppliedIdRef.current = null;
-    onNavigate(hrefWorkspaceActivity(selectedProjectId, draft.activity, { generateMode: draft.generateMode }), {
-      state: { activityDraftRestore: draft },
-    });
+    onNavigate(
+      hrefWorkspaceActivity(selectedProjectId, draft.activity, {
+        generateMode: draft.activity === 'generator' ? draft.generateMode : undefined,
+        curateMode: draft.activity === 'curator' ? draft.curateMode : undefined,
+      }),
+      {
+        state: { activityDraftRestore: draft },
+      },
+    );
   };
 
   const handleSaveActivityDraft = (): void => {
@@ -300,6 +452,7 @@ export function ProjectWorkspaceScreen({
     const draft = createActivityDraftSnapshot({
       activity: key,
       generateMode: key === 'generator' ? generateMode : undefined,
+      curateMode: key === 'curator' ? curateMode : undefined,
       title,
       savedAtLabel: t('workspace.draft.savedJustNow'),
       step: workFlowStep as 1 | 2 | 3,
@@ -326,12 +479,13 @@ export function ProjectWorkspaceScreen({
       { key: 'name', label: nameLabel },
       { key: 'version', label: 'Version', align: 'center' },
       { key: 'source', label: 'Source', align: 'center' },
+      ...(workspaceTab === 'dataFoundry' ? [{ key: 'dataKind', label: t('workspace.col.dataKind'), align: 'center' as const }] : []),
       { key: 'time', label: 'Time', align: 'center' },
       { key: 'worker', label: 'Worker', align: 'center' },
       { key: 'preprocessor', label: 'Preprocessor', align: 'center' },
       { key: 'action', label: 'Action', align: 'center' },
     ];
-  }, [workspaceTab]);
+  }, [workspaceTab, t]);
 
   React.useEffect(() => {
     setSourceValue('all');
@@ -339,7 +493,9 @@ export function ProjectWorkspaceScreen({
 
   const filteredDatasetRows = savedRowsForTab
     .filter((row) => {
-      const bySearch = row.name.toLowerCase().includes(searchValue.trim().toLowerCase());
+      const q = searchValue.trim().toLowerCase();
+      const kindBlob = row.dataKind?.toLowerCase() ?? '';
+      const bySearch = row.name.toLowerCase().includes(q) || (q.length > 0 && kindBlob.includes(q));
       const bySource = sourceValue === 'all' ? true : row.sourceType === sourceValue;
       return bySearch && bySource;
     })
@@ -364,7 +520,7 @@ export function ProjectWorkspaceScreen({
     setWorkFlowMaxStep(1);
     setPreprocessorContextDatasetName('{Created Data Set Name}');
     setLastRestoredDraft(null);
-  }, [activeWorkPageActivity]);
+  }, [activeWorkPageActivity, generateMode, curateMode]);
 
   React.useEffect(() => {
     if (!draftRestore) {
@@ -426,6 +582,15 @@ export function ProjectWorkspaceScreen({
         name: row.name,
         version: row.version,
         source: <span className={chipSourceActivityClasses}>{sourceLabel}</span>,
+        ...(workspaceTab === 'dataFoundry'
+          ? {
+              dataKind: (
+                <span className="text-xs text-slate-700" title={row.dataKind ?? ''}>
+                  {row.dataKind ?? '—'}
+                </span>
+              ),
+            }
+          : {}),
         time: row.time,
         worker: row.worker,
         preprocessor: row.preprocessor,
@@ -472,7 +637,7 @@ export function ProjectWorkspaceScreen({
               : 'transition-[padding] duration-300'
           }
         >
-          <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 lg:grid-cols-[200px_minmax(0,1fr)]">
+          <div className={[appShellInnerClass, 'grid grid-cols-1 gap-4 py-4 lg:grid-cols-[200px_minmax(0,1fr)]'].join(' ')}>
             <div className={highlightClass('sidebar')}>
               <ProjectWorkspaceSidebarBlock
                 projectTitle={activeProjectTitle}
@@ -512,21 +677,22 @@ export function ProjectWorkspaceScreen({
                 <ListStatusTabsBlock
                   value={workspaceTab}
                   onChange={(value) => setWorkspaceTab(value as WorkspaceTab)}
-                  items={[
-                    { label: 'Data Foundry', value: 'dataFoundry' },
-                    { label: 'Model Institute', value: 'modelInstitute' },
-                  ]}
+                  items={workspaceDomainTabItems}
                 />
                 <div className={['mt-4', highlightClass('workspaceActivities')].join(' ')}>
                   <ProjectWorkspaceActivityCardsBlock
                     items={activityItems}
-                    activityMenus={{ generator: [...GENERATE_ACTIVITY_MENU_OPTIONS] }}
+                    activityMenus={{
+                      generator: [...GENERATE_ACTIVITY_MENU_OPTIONS],
+                      curator: [...CURATE_ACTIVITY_MENU_OPTIONS],
+                    }}
                     onSelectActivityMenuOption={(activityKey, optionId) => {
-                      onNavigate(
-                        hrefWorkspaceActivity(selectedProjectId, activityKey as ActivityDraftActivityKey, {
-                          generateMode: optionId,
-                        }),
-                      );
+                      const key = activityKey as ActivityDraftActivityKey;
+                      if (activityKey === 'generator') {
+                        onNavigate(hrefWorkspaceActivity(selectedProjectId, key, { generateMode: optionId }));
+                      } else if (activityKey === 'curator') {
+                        onNavigate(hrefWorkspaceActivity(selectedProjectId, key, { curateMode: optionId }));
+                      }
                     }}
                     onClickActivity={(activity) => {
                       const nextWorkKey = activity as WorkspaceActivityKey;
@@ -623,9 +789,15 @@ export function ProjectWorkspaceScreen({
         description={
           activeWorkPageActivity === 'collector'
             ? 'Record robot teleoperation episodes, run validation, then save as a dataset.'
-            : activeWorkPageActivity === 'generator' && generateModeLabel
-              ? 'Configure parameters, run generation, and review the output.'
-              : 'Register, manage, and organize datasets with metadata, tags, ownership, and version tracking.'
+            : activeWorkPageActivity === 'generator' && generateMode === 'idm'
+              ? 'Select an IDM model and input video (upload or a dataset clip), fuse trajectory into the video, then continue.'
+              : activeWorkPageActivity === 'generator' && generateModeLabel
+                ? 'Configure parameters, run generation, and review the output.'
+                : activeWorkPageActivity === 'curator' && curateMode === 'merge-datasets'
+                ? 'Select saved datasets to merge into one new dataset, then run pre-processing and save.'
+                : activeWorkPageActivity === 'curator' && curateMode === 'analytics'
+                  ? 'Review dataset analytics, then continue to pre-processing and save.'
+                  : 'Register, manage, and organize datasets with metadata, tags, ownership, and version tracking.'
         }
         currentStep={workFlowStep}
         maxUnlockedStep={workFlowMaxStep}
@@ -636,13 +808,7 @@ export function ProjectWorkspaceScreen({
         historyButtonLabel={t('workspace.shell.loadDraft')}
         saveDraftButtonLabel={t('workspace.shell.saveDraft')}
         contentScrollRef={workPageContentScrollRef}
-        stepLabels={
-          activeWorkPageActivity === 'collector'
-            ? ['teleoperation', 'pre-processor', 'save datasets']
-            : activeWorkPageActivity === 'generator' && generateMode === 'synthetic-video'
-              ? ['synthetic video generation', 'pre-processor', 'save datasets']
-              : undefined
-        }
+        stepLabels={workPageStepLabels}
       >
         {lastRestoredDraft ? (
           <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-950">
@@ -700,8 +866,57 @@ export function ProjectWorkspaceScreen({
         ) : null}
         {activeWorkPageActivity !== null &&
         workFlowStep === 1 &&
-        (activeWorkPageActivity !== 'collector' &&
-          !(activeWorkPageActivity === 'generator' && generateMode === 'synthetic-video')) ? (
+        activeWorkPageActivity === 'generator' &&
+        generateMode === 'mimic-augmentation' ? (
+          <MimicAugmentationStepBlock
+            onProceedToStep2={() => {
+              setWorkFlowMaxStep(2);
+              setWorkFlowStep(2);
+            }}
+            onNotify={(message) => setSaveToast({ message })}
+          />
+        ) : null}
+        {activeWorkPageActivity !== null &&
+        workFlowStep === 1 &&
+        activeWorkPageActivity === 'generator' &&
+        generateMode === 'idm' ? (
+          <IdmTrajectoryStepBlock
+            datasetClips={idmDatasetClipOptions}
+            onProceedToStep2={() => {
+              setWorkFlowMaxStep(2);
+              setWorkFlowStep(2);
+            }}
+            onNotify={(message) => setSaveToast({ message })}
+          />
+        ) : null}
+        {activeWorkPageActivity !== null &&
+        workFlowStep === 1 &&
+        activeWorkPageActivity === 'curator' &&
+        curateMode === 'merge-datasets' ? (
+          <MergeDatasetsStepBlock
+            datasets={mergeDatasetPickRows}
+            onProceedToStep2={() => {
+              setWorkFlowMaxStep(2);
+              setWorkFlowStep(2);
+            }}
+            onNotify={(message) => setSaveToast({ message })}
+          />
+        ) : null}
+        {activeWorkPageActivity !== null &&
+        workFlowStep === 1 &&
+        activeWorkPageActivity === 'curator' &&
+        curateMode === 'analytics' ? (
+          <CurateAnalyticsStepBlock
+            onProceedToStep2={() => {
+              setWorkFlowMaxStep(2);
+              setWorkFlowStep(2);
+            }}
+            onNotify={(message) => setSaveToast({ message })}
+          />
+        ) : null}
+        {activeWorkPageActivity !== null &&
+        workFlowStep === 1 &&
+        (activeWorkPageActivity !== 'collector' && !isDedicatedGeneratorStep1 && !isDedicatedCuratorStep1) ? (
           <WorkPageTemplateCanvasBlock
             variant={workPageConfigMap[activeWorkPageActivity].variant}
             step1Footer={{
@@ -753,6 +968,7 @@ export function ProjectWorkspaceScreen({
                     const newRow: WorkspaceDatasetRow = {
                       id: newId,
                       sourceType: activeWorkPageActivity,
+                      dataKind: defaultDataKindForSavedDataset(activeWorkPageActivity),
                       no: String(maxNo + 1),
                       name: nameSnapshot,
                       version: 'v1.0',

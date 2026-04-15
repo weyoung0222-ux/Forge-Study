@@ -11,10 +11,11 @@ import { COLLECT_TELEOP_TARGET_EPISODES } from "../../data-spec/mocks/activityWo
 import {
   WORK_PAGE_DATASET_PARAMETERS_TITLE,
   collectTeleopGridHeightClasses,
-  workPageCanvasCardClasses,
   workPageSectionContainerTitleClasses,
   workPageStep1TwoColumnGridClasses,
 } from "../styles/workPageCanvasClasses";
+import { ActivityStepContainerBlock } from "../molecules/ActivityStepContainer.block";
+import { WorkPageActivityFooterToolbarBlock } from "../molecules/WorkPageActivityFooterToolbar.block";
 import {
   formControlInputClasses,
   formControlTextareaClasses,
@@ -161,15 +162,24 @@ export function CollectTeleoperationStepBlock({
 
   return (
     <div className={gridClassName}>
-      <section
-        className={[
-          workPageCanvasCardClasses,
-          "flex h-full min-h-0 flex-col",
-        ].join(" ")}
+      <ActivityStepContainerBlock
+        header={
+          <>
+            <h2 className="sr-only">Teleoperation parameters</h2>
+            <p className={workPageSectionContainerTitleClasses}>{WORK_PAGE_DATASET_PARAMETERS_TITLE}</p>
+          </>
+        }
+        footer={
+          <WorkPageActivityFooterToolbarBlock
+            right={
+              <button type="button" onClick={handleApply} className={buttonPrimarySmClasses}>
+                {uiTitleCase("apply", locale)}
+              </button>
+            }
+          />
+        }
       >
-        <h2 className="sr-only">Teleoperation parameters</h2>
-        <p className={workPageSectionContainerTitleClasses}>{WORK_PAGE_DATASET_PARAMETERS_TITLE}</p>
-        <div className={[workPageFormFieldStackClasses, "mt-3 min-h-0 flex-1 overflow-y-auto pr-0.5"].join(" ")}>
+        <div className={workPageFormFieldStackClasses}>
           <WorkPageFormFieldBlock label="Robot Model" required>
             <input
               value={robotModel}
@@ -279,148 +289,85 @@ export function CollectTeleoperationStepBlock({
             />
           </WorkPageFormFieldBlock>
         </div>
+      </ActivityStepContainerBlock>
 
-        <div className="mt-4 shrink-0 border-t border-slate-100 pt-3">
-          <button
-            type="button"
-            onClick={handleApply}
-            className={buttonPrimarySmClasses}
-          >
-            {uiTitleCase("apply", locale)}
-          </button>
-        </div>
-      </section>
+      <ActivityStepContainerBlock
+        header={
+          <>
+            <h2 className="sr-only">Teleoperation session</h2>
+            <div className="shrink-0 border-b border-slate-100 pb-3">
+              <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-4">
+                <div className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center sm:text-left">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                    Episode
+                  </p>
+                  <p className="text-lg font-semibold tabular-nums text-slate-900">
+                    {Math.min(displayEpisode, totalEpisodes)} / {totalEpisodes}
+                  </p>
+                </div>
 
-      <section
-        className={[
-          workPageCanvasCardClasses,
-          "flex h-full min-h-0 flex-col",
-        ].join(" ")}
-      >
-        <h2 className="sr-only">Teleoperation session</h2>
-
-        <div className="shrink-0 border-b border-slate-100 pb-3">
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-stretch sm:gap-4">
-            <div className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-center sm:text-left">
-              <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                Episode
-              </p>
-              <p className="text-lg font-semibold tabular-nums text-slate-900">
-                {Math.min(displayEpisode, totalEpisodes)} / {totalEpisodes}
-              </p>
-            </div>
-
-            <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
-              <p className="text-center text-xs font-medium text-slate-700 sm:text-left">
-                {statusLine}
-              </p>
-              <div className="flex w-full min-w-0 items-center gap-2">
-                <span className="w-9 shrink-0 text-right text-[11px] tabular-nums text-slate-500">
-                  {episodeProgressPct}%
-                </span>
-                <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-200">
-                  <div
-                    className="h-full rounded-full bg-slate-700 transition-[width] duration-100 ease-linear"
-                    style={{ width: `${episodeProgressPct}%` }}
-                  />
+                <div className="flex min-w-0 flex-1 flex-col justify-center gap-2">
+                  <p className="text-center text-xs font-medium text-slate-700 sm:text-left">
+                    {statusLine}
+                  </p>
+                  <div className="flex w-full min-w-0 items-center gap-2">
+                    <span className="w-9 shrink-0 text-right text-[11px] tabular-nums text-slate-500">
+                      {episodeProgressPct}%
+                    </span>
+                    <div className="h-2.5 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-200">
+                      <div
+                        className="h-full rounded-full bg-slate-700 transition-[width] duration-100 ease-linear"
+                        style={{ width: `${episodeProgressPct}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div className="flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-y-auto py-2">
-            <div className="grid w-full max-w-full grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,2.35fr)_minmax(0,1fr)] sm:items-center">
-            {cameraSlots.map((state, index) => (
-              <div key={String(index)} className="flex min-w-0 flex-col items-stretch justify-center">
+          </>
+        }
+        footer={
+          <WorkPageActivityFooterToolbarBlock
+            left={
+              <>
                 <button
                   type="button"
-                  onClick={() => toggleCamera(index)}
-                  className={[
-                    "flex w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed transition aspect-video max-h-[min(40vh,16rem)] sm:max-h-[min(42vh,18rem)]",
-                    state === "connected"
-                      ? "border-indigo-400 bg-indigo-50/80 text-indigo-900"
-                      : "border-slate-300 bg-slate-50 text-slate-500 hover:border-slate-400 hover:bg-white",
-                  ].join(" ")}
-                  aria-label={
-                    state === "connected"
-                      ? `Camera ${index + 1} connected`
-                      : `Connect camera ${index + 1}`
-                  }
+                  onClick={handleStart}
+                  disabled={isRecording}
+                  className={buttonSecondarySmClasses}
                 >
-                  {state === "connected" ? (
-                    <span className="text-center text-xs font-medium leading-snug">
-                      Live
-                      <br />
-                      <span className="text-[10px] font-normal text-slate-600">
-                        Camera {index + 1}
-                      </span>
-                    </span>
-                  ) : (
-                    <>
-                      <PlusOutlined className="h-8 w-8" aria-hidden />
-                      <span className="text-[11px]">{uiTitleCase("add feed", locale)}</span>
-                    </>
-                  )}
+                  {uiTitleCase("start", locale)}
                 </button>
-              </div>
-            ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-auto shrink-0 border-t border-slate-100 pt-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center justify-start gap-2">
-              <button
-                type="button"
-                onClick={handleStart}
-                disabled={isRecording}
-                className={buttonSecondarySmClasses}
-              >
-                {uiTitleCase("start", locale)}
-              </button>
-              <button
-                type="button"
-                onClick={handleStop}
-                disabled={!isRecording}
-                className={buttonSecondarySmClasses}
-              >
-                {uiTitleCase("stop", locale)}
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={isRecording || completedEpisodes >= totalEpisodes}
-                className={buttonSecondarySmClasses}
-              >
-                {uiTitleCase("next", locale)}
-              </button>
-              <button
-                type="button"
-                onClick={handleRetry}
-                className={buttonSecondarySmClasses}
-              >
-                {uiTitleCase("retry", locale)}
-              </button>
-              <button
-                type="button"
-                onClick={handleFinish}
-                className={buttonSecondarySmClasses}
-              >
-                {uiTitleCase("finish", locale)}
-              </button>
-            </div>
-            <div className="flex shrink-0 items-center sm:ml-auto">
+                <button
+                  type="button"
+                  onClick={handleStop}
+                  disabled={!isRecording}
+                  className={buttonSecondarySmClasses}
+                >
+                  {uiTitleCase("stop", locale)}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={isRecording || completedEpisodes >= totalEpisodes}
+                  className={buttonSecondarySmClasses}
+                >
+                  {uiTitleCase("next", locale)}
+                </button>
+                <button type="button" onClick={handleRetry} className={buttonSecondarySmClasses}>
+                  {uiTitleCase("retry", locale)}
+                </button>
+                <button type="button" onClick={handleFinish} className={buttonSecondarySmClasses}>
+                  {uiTitleCase("finish", locale)}
+                </button>
+              </>
+            }
+            right={
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={!saveEnabled}
-                className={[
-                  buttonPrimarySmClasses,
-                  !saveEnabled ? "opacity-40" : "",
-                ].join(" ")}
+                className={[buttonPrimarySmClasses, !saveEnabled ? "opacity-40" : ""].join(" ")}
                 title={
                   saveEnabled
                     ? "Go to pre-processor"
@@ -429,10 +376,49 @@ export function CollectTeleoperationStepBlock({
               >
                 {uiTitleCase("save", locale)}
               </button>
-            </div>
-          </div>
+            }
+          />
+        }
+      >
+        <div className="flex min-h-0 min-w-0 flex-col py-3">
+              <div className="grid w-full max-w-full grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,2.35fr)_minmax(0,1fr)] sm:items-center">
+                {cameraSlots.map((state, index) => (
+                  <div key={String(index)} className="flex min-w-0 flex-col items-stretch justify-center">
+                    <button
+                      type="button"
+                      onClick={() => toggleCamera(index)}
+                      className={[
+                        "flex w-full flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed transition aspect-video max-h-[min(40vh,16rem)] sm:max-h-[min(42vh,18rem)]",
+                        state === "connected"
+                          ? "border-indigo-400 bg-indigo-50/80 text-indigo-900"
+                          : "border-slate-300 bg-slate-50 text-slate-500 hover:border-slate-400 hover:bg-white",
+                      ].join(" ")}
+                      aria-label={
+                        state === "connected"
+                          ? `Camera ${index + 1} connected`
+                          : `Connect camera ${index + 1}`
+                      }
+                    >
+                      {state === "connected" ? (
+                        <span className="text-center text-xs font-medium leading-snug">
+                          Live
+                          <br />
+                          <span className="text-[10px] font-normal text-slate-600">
+                            Camera {index + 1}
+                          </span>
+                        </span>
+                      ) : (
+                        <>
+                          <PlusOutlined className="h-8 w-8" aria-hidden />
+                          <span className="text-[11px]">{uiTitleCase("add feed", locale)}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
         </div>
-      </section>
+      </ActivityStepContainerBlock>
     </div>
   );
 }

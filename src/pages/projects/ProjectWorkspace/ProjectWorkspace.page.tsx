@@ -11,6 +11,7 @@ export function ProjectWorkspacePage(): JSX.Element {
   const searchParams = new URLSearchParams(location.search);
   const overlayKey = searchParams.get('overlay') ?? undefined;
   const generateMode = searchParams.get('generateMode') ?? undefined;
+  const curateMode = searchParams.get('curateMode') ?? undefined;
   const draftRestore = (location.state as { activityDraftRestore?: ActivityDraftSession } | null)?.activityDraftRestore;
 
   const clearDraftLocationState = React.useCallback(() => {
@@ -22,6 +23,7 @@ export function ProjectWorkspacePage(): JSX.Element {
       projectId={projectId ?? 'Unknown'}
       workKey={workKey}
       generateMode={generateMode}
+      curateMode={curateMode}
       workspacePathname={location.pathname}
       workspaceSearch={location.search}
       overlayKey={overlayKey}

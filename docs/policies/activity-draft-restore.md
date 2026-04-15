@@ -6,21 +6,24 @@ Loading a draft must show the **same activity shell and sub-flow** as before the
 
 Under **Generate**, the three menu entries (`synthetic-video`, `mimic-augmentation`, `idm`) are **three separate work pages** (same path, different `generateMode`). Drafts are **scoped per page**: each list shows only drafts whose `generateMode` matches the current URL. Save / Load draft must not navigate away from that sub-flow.
 
+Under **Curate**, sub-flows use `curateMode` (`merge-datasets`, `analytics`) the same way: persist `curateMode` on `ActivityDraftSession`, filter drafts by it, and restore with `hrefWorkspaceActivity(..., { curateMode })`.
+
 ## Rules
 
 1. **Route identity**  
    A draft is restored by navigating to the same work URL shape as a normal entry into that activity:
    - Path: `/projects/:projectId/workspace/:activity`
    - **Generate** (`activity === generator`): append `?generateMode=…` when the user was in a Generate sub-flow (e.g. `synthetic-video`). Omit the query only for the default “plain” Generate shell.
+   - **Curate** (`activity === curator`): append `?curateMode=…` for Merge datasets / Analytics (e.g. `merge-datasets`).
 
 2. **Persisted fields**  
-   `ActivityDraftSession` stores `generateMode` (optional) alongside `activity`, steps, and field snapshots. Saving a draft must copy the current `generateMode` from the page; loading must navigate with `hrefWorkspaceActivity` / the same query rules so the shell title and step-1 body (e.g. Synthetic Video vs template canvas) stay aligned.
+   `ActivityDraftSession` stores `generateMode` and `curateMode` (optional) alongside `activity`, steps, and field snapshots. Saving a draft must copy the current mode from the page; loading must navigate with `hrefWorkspaceActivity` so the shell title and step-1 body stay aligned.
 
 3. **Draft list scope**  
-   For `generator`, filter drafts with `(draft.generateMode ?? '') === (currentGenerateMode ?? '')` so Synthetic / Mimic / IDM (and plain Generate) each have an isolated list.
+   For `generator`, filter drafts with `(draft.generateMode ?? '') === (currentGenerateMode ?? '')`. For `curator`, filter with `(draft.curateMode ?? '') === (currentCurateMode ?? '')`.
 
-4. **Overlays without dropping `generateMode`**  
-   Opening or closing `overlay=…` (jobs drawer, activity draft history) must use `hrefWithWorkspaceOverlay` so existing query keys (especially `generateMode`) are preserved. Do not build overlay URLs from pathname only.
+4. **Overlays without dropping sub-flow query**  
+   Opening or closing `overlay=…` (jobs drawer, activity draft history) must use `hrefWithWorkspaceOverlay` so existing query keys (`generateMode`, `curateMode`, …) are preserved. Do not build overlay URLs from pathname only.
 
 5. **Implementation**  
    - `hrefWorkspaceActivity` — post-select draft navigation.  

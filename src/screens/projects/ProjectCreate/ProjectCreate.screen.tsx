@@ -10,6 +10,7 @@ import {
   globalTopNavBrandIcon,
   useGlobalTopNavActions,
 } from '../../../navigation/globalTopNav';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 
 type Props = {
   onNavigate: (path: string, options?: { state?: unknown }) => void;
@@ -40,7 +41,7 @@ export function ProjectCreateScreen({ onNavigate }: Props): JSX.Element {
         actions={globalTopNavActions}
       />
 
-      <div className="flex min-h-0 w-full flex-1 flex-col lg:flex-row lg:items-stretch">
+      <div className={[appShellInnerClass, 'flex min-h-0 flex-1 flex-col lg:flex-row lg:items-stretch'].join(' ')}>
         {/* 좌측: 미선택 안내 또는 선택 로봇 대형 프리뷰 */}
         <section
           className="relative flex min-h-[40vh] flex-1 flex-col items-center justify-center overflow-hidden px-6 py-10 lg:min-h-[calc(100vh-3.5rem)]"

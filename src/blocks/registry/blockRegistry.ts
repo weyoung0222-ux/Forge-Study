@@ -33,6 +33,14 @@ export const blockRegistry: BlockMeta[] = [
     tags: ['navigation', 'global', 'header'],
   },
   {
+    id: 'rfm.globalNavSettingsPanel',
+    version: '1.0.0',
+    owner: 'product-design-system',
+    category: 'organism',
+    description: 'GNB Settings overlay — LNB with profile, search, sections (General, Theme, RFM, data, robotics, pipeline)',
+    tags: ['settings', 'navigation', 'RFM', 'overlay'],
+  },
+  {
     id: 'rfm.listHeader',
     version: '1.0.0',
     owner: 'product-design-system',
@@ -113,6 +121,24 @@ export const blockRegistry: BlockMeta[] = [
     description:
       'Register work page file column — dashed dropzone, drag-and-drop, File Upload control; optional children slot (e.g. Text Prompt)',
     tags: ['form', 'file', 'upload', 'workpage', 'register'],
+  },
+  {
+    id: 'rfm.activityStepContainer',
+    version: '1.0.0',
+    owner: 'product-design-system',
+    category: 'molecule',
+    description:
+      'Activity step card shell: header (title) + flex-1 scrollable content + optional footer — fills grid cell height without sticky/absolute',
+    tags: ['workpage', 'layout', 'RFM', 'activity'],
+  },
+  {
+    id: 'rfm.workPageActivityFooterToolbar',
+    version: '1.0.0',
+    owner: 'product-design-system',
+    category: 'molecule',
+    description:
+      'Footer action row for ActivityStepContainer — left secondary group + right primary (Collect teleop pattern); used only in card footer, not sticky',
+    tags: ['workpage', 'toolbar', 'RFM', 'actions'],
   },
   {
     id: 'rfm.buttonCatalog',
@@ -372,6 +398,41 @@ export const blockRegistry: BlockMeta[] = [
     description:
       'Generate (synthetic video) step 1 — parameter form, Run/Save, progress and placeholder until complete, responsive video with playback and overflow actions',
     tags: ['workpage', 'generator', 'synthetic-video', 'RFM'],
+  },
+  {
+    id: 'rfm.mimicAugmentationStep',
+    version: '1.0.0',
+    owner: 'product-design-system',
+    category: 'organism',
+    description:
+      'Generate (mimic augmentation) step 1 — parameters + simulation file input, Run/Rerun, progress bar top of preview, large source thumbnail + grid of small augmented sim thumbnails',
+    tags: ['workpage', 'generator', 'mimic-augmentation', 'RFM'],
+  },
+  {
+    id: 'rfm.idmTrajectoryStep',
+    version: '1.0.0',
+    owner: 'product-design-system',
+    category: 'organism',
+    description:
+      'Generate (IDM) step 1 — IDM model select, input video via file upload or dataset clip, Run fusion, trajectory overlay preview, continue to pre-processor',
+    tags: ['workpage', 'generator', 'idm', 'inverse-dynamics', 'RFM'],
+  },
+  {
+    id: 'rfm.mergeDatasetsStep',
+    version: '1.0.0',
+    owner: 'product-design-system',
+    category: 'organism',
+    description:
+      'Curate (merge datasets) step 1 — multi-select saved workspace datasets via checkboxes, merged name/description, continue to pre-processor',
+    tags: ['workpage', 'curator', 'merge-datasets', 'RFM'],
+  },
+  {
+    id: 'rfm.curateAnalyticsStep',
+    version: '1.0.0',
+    owner: 'product-design-system',
+    category: 'organism',
+    description: 'Curate (analytics) step 1 — placeholder panel until analytics charts are specified',
+    tags: ['workpage', 'curator', 'analytics', 'RFM'],
   },
   {
     id: 'rfm.workPageShell',

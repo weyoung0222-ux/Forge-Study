@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { GlobalTopNavBlock, type TopNavItem, type TopNavUtilityButton } from '../../blocks/molecules/GlobalTopNav.block';
+import { appShellInnerClass } from '../../styles/appLayoutClasses';
 import { ListHeaderBlock } from '../../blocks/molecules/ListHeader.block';
 import { ListStateBlock } from '../../blocks/molecules/ListState.block';
 import { ListStatusTabsBlock, type ListStatusTab } from '../../blocks/molecules/ListStatusTabs.block';
@@ -90,7 +91,7 @@ export function ListBasePattern({
         />
       </div>
 
-      <main className="mx-auto grid w-full max-w-7xl gap-3 px-6 py-6">
+      <main className={[appShellInnerClass, 'grid gap-3 py-6'].join(' ')}>
         <div className={highlightClass('listHeader')}>
           {highlightBadge('listHeader')}
           <ListHeaderBlock

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
+
 import { GlobalTopNavBlock } from '../../../blocks/molecules/GlobalTopNav.block';
 import { ListHeaderBlock } from '../../../blocks/molecules/ListHeader.block';
 import { OverlayDialogBlock } from '../../../blocks/molecules/OverlayDialog.block';
@@ -23,6 +25,10 @@ import { ProjectJobsOnProcessDrawerBlock } from '../../../blocks/organisms/Proje
 import { ActivityDraftHistoryDrawerBlock } from '../../../blocks/organisms/ActivityDraftHistoryDrawer.block';
 import { ActivitySaveDatasetBlock } from '../../../blocks/organisms/ActivitySaveDataset.block';
 import { CollectTeleoperationStepBlock } from '../../../blocks/organisms/CollectTeleoperationStep.block';
+import { CurateAnalyticsStepBlock } from '../../../blocks/organisms/CurateAnalyticsStep.block';
+import { MergeDatasetsStepBlock, type MergeDatasetPickRow } from '../../../blocks/organisms/MergeDatasetsStep.block';
+import { IdmTrajectoryStepBlock } from '../../../blocks/organisms/IdmTrajectoryStep.block';
+import { MimicAugmentationStepBlock } from '../../../blocks/organisms/MimicAugmentationStep.block';
 import { SyntheticVideoCreationStepBlock } from '../../../blocks/organisms/SyntheticVideoCreationStep.block';
 import { ActivityValidationBlock } from '../../../blocks/organisms/ActivityValidation.block';
 import { WorkPageShellBlock, type WorkFlowStep } from '../../../blocks/organisms/WorkPageShell.block';
@@ -38,8 +44,11 @@ import { ChipCatalogVariantShowcase } from '../../../blocks/molecules/Chip.block
 import { FormTagInputBlock } from '../../../blocks/molecules/FormTagInput.block';
 import { WorkPageFormFieldBlock } from '../../../blocks/molecules/WorkPageFormField.block';
 import { WorkPageFileUploadDropzoneBlock } from '../../../blocks/molecules/WorkPageFileUploadDropzone.block';
+import { ActivityStepContainerBlock } from '../../../blocks/molecules/ActivityStepContainer.block';
+import { WorkPageActivityFooterToolbarBlock } from '../../../blocks/molecules/WorkPageActivityFooterToolbar.block';
 import { TabsShowcaseBlock } from '../../../blocks/molecules/TabsShowcase.block';
 import { RobotSelectCardBlock } from '../../../blocks/molecules/RobotSelectCard.block';
+import { buttonPrimarySmClasses, buttonSecondarySmClasses } from '../../../blocks/styles/buttonClasses';
 import { libraryAssetRows } from '../../../data-spec/mocks/libraryAssets.mock';
 import { projectCreateRobotOptions } from '../../../data-spec/mocks/projectCreateRobots.mock';
 import { activityDraftSessionsMock } from '../../../data-spec/mocks/activityDraftHistory.mock';
@@ -199,6 +208,45 @@ function SampleCard({ title, blockId, description, codePath, children }: SampleC
     </article>
   );
 }
+
+const CATALOG_MERGE_DATASET_PREVIEW_ROWS: MergeDatasetPickRow[] = [
+  {
+    id: 'cat-m1',
+    no: '1',
+    name: 'Warehouse Scenarios - Run #112',
+    version: 'v1.0',
+    sourceType: 'register',
+    time: '2025-01-21 10:30',
+    worker: 'Wiyoung',
+  },
+  {
+    id: 'cat-m2',
+    no: '2',
+    name: 'Pick Route LiveCollect',
+    version: 'v0.9',
+    sourceType: 'collector',
+    time: '2025-01-22 09:00',
+    worker: 'Wiyoung',
+  },
+  {
+    id: 'cat-m3',
+    no: '3',
+    name: 'Synth Grasp Batch',
+    version: 'v1.0',
+    sourceType: 'generator',
+    time: '2025-01-23 11:15',
+    worker: 'Wiyoung',
+  },
+  {
+    id: 'cat-m4',
+    no: '4',
+    name: 'Curated Merge v0',
+    version: 'v0.8',
+    sourceType: 'curator',
+    time: '2025-01-24 08:00',
+    worker: 'Wiyoung',
+  },
+];
 
 function CatalogGlobalTopNavPreview(): JSX.Element {
   const { t } = useLanguage();
@@ -454,6 +502,10 @@ export function CatalogPage(): JSX.Element {
               { id: 'mimic-augmentation', label: 'Mimic Augmentation' },
               { id: 'idm', label: 'IDM' },
             ],
+            curator: [
+              { id: 'merge-datasets', label: 'Merge datasets' },
+              { id: 'analytics', label: 'Analytics' },
+            ],
           }}
           onSelectActivityMenuOption={() => {}}
         />
@@ -685,6 +737,57 @@ export function CatalogPage(): JSX.Element {
     if (id === 'desc-rfm.workPageFileUploadDropzone') {
       return <WorkPageFileUploadDropzoneCatalogPreview />;
     }
+    if (id === 'desc-rfm.activityStepContainer') {
+      return (
+        <div className="h-64 max-w-md">
+          <ActivityStepContainerBlock
+            header={<p className="text-sm font-semibold text-slate-900">Activity step title</p>}
+            footer={
+              <WorkPageActivityFooterToolbarBlock
+                left={
+                  <>
+                    <button type="button" className={buttonSecondarySmClasses}>
+                      Secondary
+                    </button>
+                  </>
+                }
+                right={<button type="button" className={buttonPrimarySmClasses}>Primary</button>}
+              />
+            }
+          >
+            <div className="space-y-2 text-xs leading-relaxed text-slate-600">
+              {Array.from({ length: 10 }, (_, i) => (
+                <p key={`line-${String(i)}`}>Scrollable body line {i + 1} — fills space between header and footer.</p>
+              ))}
+            </div>
+          </ActivityStepContainerBlock>
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.workPageActivityFooterToolbar') {
+      return (
+        <div className="max-w-xl rounded-lg border border-slate-200 bg-white p-3">
+          <p className="mb-2 text-xs text-slate-500">
+            Left/right button groups for use inside ActivityStepContainer footer (flex layout, not sticky).
+          </p>
+          <div className="border-t border-slate-200 pt-3">
+            <WorkPageActivityFooterToolbarBlock
+              left={
+                <>
+                  <button type="button" className={buttonSecondarySmClasses}>
+                    Start
+                  </button>
+                  <button type="button" className={buttonSecondarySmClasses}>
+                    Stop
+                  </button>
+                </>
+              }
+              right={<button type="button" className={buttonPrimarySmClasses}>Save</button>}
+            />
+          </div>
+        </div>
+      );
+    }
     if (id === 'desc-rfm.workPageTemplateCanvas') {
       return <WorkPageTemplateCanvasBlock variant="type1-parameter-preview" />;
     }
@@ -699,6 +802,34 @@ export function CatalogPage(): JSX.Element {
       return (
         <div className="max-h-[min(560px,82vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
           <SyntheticVideoCreationStepBlock onProceedToStep2={() => {}} />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.mimicAugmentationStep') {
+      return (
+        <div className="max-h-[min(560px,82vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <MimicAugmentationStepBlock onProceedToStep2={() => {}} />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.idmTrajectoryStep') {
+      return (
+        <div className="max-h-[min(560px,82vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <IdmTrajectoryStepBlock onProceedToStep2={() => {}} />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.mergeDatasetsStep') {
+      return (
+        <div className="max-h-[min(560px,82vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <MergeDatasetsStepBlock datasets={CATALOG_MERGE_DATASET_PREVIEW_ROWS} onProceedToStep2={() => {}} />
+        </div>
+      );
+    }
+    if (id === 'desc-rfm.curateAnalyticsStep') {
+      return (
+        <div className="max-h-[min(480px,70vh)] overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2">
+          <CurateAnalyticsStepBlock onProceedToStep2={() => {}} />
         </div>
       );
     }
@@ -865,7 +996,8 @@ export function CatalogPage(): JSX.Element {
   };
 
   return (
-    <main className="mx-auto w-full max-w-[1600px] px-6 py-8">
+    <main className="min-h-screen bg-white py-8">
+      <div className={appShellInnerClass}>
       <header className="mb-6">
         <h1 className="text-2xl font-semibold text-slate-900">{t('catalog.title')}</h1>
         <p className="mt-1 text-sm text-slate-600">{t('catalog.subtitle')}</p>
@@ -972,6 +1104,7 @@ export function CatalogPage(): JSX.Element {
           </div>
         </div>
       </section>
+      </div>
 
       <OverlayDialogBlock
         title={t('catalog.fullscreenTitle')}

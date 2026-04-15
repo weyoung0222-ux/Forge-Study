@@ -17,6 +17,8 @@ export type ActivityDraftSession = {
    * Generate sub-flow (URL `generateMode`). Required to restore the same shell as Synthetic Video Creation vs default Data Generate.
    */
   generateMode?: string;
+  /** Curate sub-flow (URL `curateMode`). */
+  curateMode?: string;
   title: string;
   savedAtLabel: string;
   step: 1 | 2 | 3;
@@ -91,8 +93,8 @@ export const activityDraftSessionsMock: ActivityDraftSession[] = [
     step: 1,
     maxUnlockedStep: 1,
     step1Parameters: [
-      { label: 'Frame stride', value: '4' },
-      { label: 'Label head', value: 'idm_v2_small' },
+      { label: 'IDM model', value: 'IDM · AGIBOT warehouse v1 (RFM)' },
+      { label: 'Video source', value: 'Dataset clip (Saved Datasets)' },
     ],
     preprocessorContextDatasetTitle: 'IDM-Scratch-A',
     saveDatasetName: '',
@@ -117,6 +119,7 @@ export const activityDraftSessionsMock: ActivityDraftSession[] = [
   {
     id: 'draft-cur-04',
     activity: 'curator',
+    curateMode: 'merge-datasets',
     title: 'Merge runs A+B — label conflicts unresolved',
     savedAtLabel: '2026-04-10 18:40',
     step: 1,
@@ -154,6 +157,7 @@ export function formatDraftSubtitle(draft: ActivityDraftSession): string {
 export function createActivityDraftSnapshot(params: {
   activity: ActivityDraftActivityKey;
   generateMode?: string;
+  curateMode?: string;
   title: string;
   savedAtLabel: string;
   step: 1 | 2 | 3;

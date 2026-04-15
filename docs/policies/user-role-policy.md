@@ -20,6 +20,15 @@
   - `data engineer`: executes features under Data Foundry.
   - `model engineer`: executes features under Model Institute.
 
+### Workspace (project) — domain tabs
+On **Project Workspace** (`/projects/:projectId/workspace`), the **Data Foundry** / **Model Institute** tabs are filtered by Dev sub-role:
+- **`project owner`**: both tabs are shown (full project scope).
+- **`data engineer`** (and not `project owner`): **Data Foundry** tab only.
+- **`model engineer`** (and not `project owner`): **Model Institute** tab only.
+- A member with **both** `data engineer` and `model engineer` (and not `project owner`): **both** tabs — same effective scope as owner for tab visibility.
+
+Implementation: `getWorkspaceTabVisibility` in `src/utils/workspaceTabVisibility.ts` (`ProjectWorkspace.screen.tsx`).
+
 ### Supporter
 - Definition is pending (TBD).
 
@@ -36,3 +45,4 @@
   - related screen behavior
   - block/catalog descriptions
   - this policy document
+  - workspace tab rules (`workspaceTabVisibility.ts`) when Dev sub-role scope changes

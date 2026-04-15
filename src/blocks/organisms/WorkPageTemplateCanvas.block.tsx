@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { FormTagInputBlock } from '../molecules/FormTagInput.block';
+import { ActivityStepContainerBlock } from '../molecules/ActivityStepContainer.block';
+import { WorkPageActivityFooterToolbarBlock } from '../molecules/WorkPageActivityFooterToolbar.block';
 import { WorkPageFileUploadDropzoneBlock } from '../molecules/WorkPageFileUploadDropzone.block';
 import { WorkPageFormFieldBlock } from '../molecules/WorkPageFormField.block';
 import { useLanguage } from '../../context/LanguageContext';
@@ -8,6 +10,7 @@ import { toTitleCase, uiTitleCase } from '../../utils/titleCase';
 import {
   WORK_PAGE_DATASET_PARAMETERS_TITLE,
   WORK_PAGE_FILE_SETTINGS_TITLE,
+  collectTeleopGridHeightClasses,
   workPageCanvasCardClasses,
   workPageSectionContainerTitleClasses,
   workPageStep1FooterRowClasses,
@@ -38,17 +41,16 @@ export type WorkPageCanvasFooterProps = {
   primaryLabel?: string;
 };
 
-type Props = {
-  variant: WorkPageTemplateVariant;
-  step1Footer?: WorkPageCanvasFooterProps;
-  step3Footer?: WorkPageCanvasFooterProps;
-};
-
-function WorkCanvasFooterRow({ onPrimary, onPrevious, primaryLabel = 'continue' }: WorkPageCanvasFooterProps): JSX.Element | null {
+function WorkCanvasFooterRow({
+  onPrimary,
+  onPrevious,
+  primaryLabel = 'continue',
+  rowClassName,
+}: WorkPageCanvasFooterProps & { rowClassName?: string }): JSX.Element | null {
   const { locale } = useLanguage();
   if (!onPrimary && !onPrevious) return null;
   return (
-    <div className={workPageStep1FooterRowClasses}>
+    <div className={rowClassName ?? workPageStep1FooterRowClasses}>
       {onPrevious ? (
         <button type="button" onClick={onPrevious} className={buttonSecondarySmClasses}>
           {uiTitleCase('previous', locale)}
@@ -62,6 +64,12 @@ function WorkCanvasFooterRow({ onPrimary, onPrevious, primaryLabel = 'continue' 
     </div>
   );
 }
+
+type Props = {
+  variant: WorkPageTemplateVariant;
+  step1Footer?: WorkPageCanvasFooterProps;
+  step3Footer?: WorkPageCanvasFooterProps;
+};
 
 const Panel = ({ className = 'h-24', label }: { className?: string; label: string }): JSX.Element => (
   <div className={['grid place-items-center rounded-md border border-slate-200 bg-slate-50 text-xs text-slate-500', className].join(' ')}>
@@ -100,66 +108,91 @@ function Type4SaveDatasetCanvasBody({ step3Footer }: { step3Footer?: WorkPageCan
   );
 }
 
-/** Register step 1 (type2) — file upload state lives with template preview. */
+/** Register step 1 (type2) — same 2-col + height as Collect / Generate; Register + Previous in right card footer (flex, no sticky). */
 function WorkPageType2ParameterOnlyBody({ step1Footer }: { step1Footer?: WorkPageCanvasFooterProps }): JSX.Element {
+  const { locale } = useLanguage();
   const [uploadFileName, setUploadFileName] = React.useState('');
+  const gridClassName = [
+    workPageStep1TwoColumnGridClasses,
+    collectTeleopGridHeightClasses,
+    'min-h-0 lg:grid-rows-[minmax(0,1fr)]',
+  ].join(' ');
+
+  const toolbarLeft =
+    step1Footer?.onPrevious != null ? (
+      <button type="button" onClick={step1Footer.onPrevious} className={buttonSecondarySmClasses}>
+        {uiTitleCase('previous', locale)}
+      </button>
+    ) : (
+      <button type="button" className={buttonSecondarySmClasses}>
+        {uiTitleCase('previous', locale)}
+      </button>
+    );
+
+  const toolbarRight =
+    step1Footer?.onPrimary != null ? (
+      <button type="button" onClick={step1Footer.onPrimary} className={buttonPrimarySmClasses}>
+        {uiTitleCase(step1Footer.primaryLabel ?? 'register', locale)}
+      </button>
+    ) : (
+      <button type="button" className={buttonPrimarySmClasses}>
+        {uiTitleCase('register', locale)}
+      </button>
+    );
+
   return (
-    <>
-      <div className={workPageStep1TwoColumnGridClasses}>
-        <section className={workPageCanvasCardClasses}>
-          <p className={workPageSectionContainerTitleClasses}>{WORK_PAGE_DATASET_PARAMETERS_TITLE}</p>
-          <div className={[workPageFormFieldStackClasses, 'mt-3'].join(' ')}>
-            <WorkPageFormFieldBlock label="Input (Mandatory)" required>
-              <input className={formControlInputClasses} placeholder="Placeholder" aria-required />
-            </WorkPageFormFieldBlock>
-            <WorkPageFormFieldBlock label="Input (Optional)">
-              <input className={formControlInputClasses} placeholder="Enter Text" />
-            </WorkPageFormFieldBlock>
-            <WorkPageFormFieldBlock label="Input (Big)">
-              <textarea className={[formControlTextareaClasses, 'h-20'].join(' ')} placeholder="Description..." />
-            </WorkPageFormFieldBlock>
-            <WorkPageFormFieldBlock label="Dropdown (Mandatory)" required>
-              <select className={[formControlSelectClasses, 'w-full'].join(' ')} aria-required>
-                <option>Choose Model</option>
-              </select>
-            </WorkPageFormFieldBlock>
-            <WorkPageFormFieldBlock label="Dropdown (Optional)">
-              <select className={[formControlSelectClasses, 'w-full'].join(' ')}>
-                <option>Choose Model</option>
-              </select>
-            </WorkPageFormFieldBlock>
-            <Type2ParameterTagsField />
-          </div>
-        </section>
-
-        <section className={workPageCanvasCardClasses}>
-          <p className={workPageSectionContainerTitleClasses}>{WORK_PAGE_FILE_SETTINGS_TITLE}</p>
-          <div className="mt-3">
-            <WorkPageFileUploadDropzoneBlock
-              selectedFileName={uploadFileName}
-              onFileChange={(f) => setUploadFileName(f?.name ?? '')}
-            >
-              <WorkPageFormFieldBlock label="Text Prompt">
-                <textarea className={[formControlTextareaClasses, 'h-24'].join(' ')} placeholder="Description..." />
-              </WorkPageFormFieldBlock>
-            </WorkPageFileUploadDropzoneBlock>
-          </div>
-        </section>
-      </div>
-
-      {step1Footer?.onPrimary || step1Footer?.onPrevious ? (
-        <WorkCanvasFooterRow {...step1Footer} primaryLabel={step1Footer.primaryLabel ?? 'register'} />
-      ) : (
-        <div className={workPageStep1FooterRowClasses}>
-          <button type="button" className="h-8 rounded-md border border-slate-300 bg-white px-3 text-xs text-slate-700">
-            Previous
-          </button>
-          <button type="button" className="h-8 rounded-md bg-slate-900 px-3 text-xs font-semibold text-white">
-            Register
-          </button>
+    <div className={gridClassName}>
+      <ActivityStepContainerBlock
+        header={
+          <>
+            <h2 className="sr-only">Dataset parameters</h2>
+            <p className={workPageSectionContainerTitleClasses}>{WORK_PAGE_DATASET_PARAMETERS_TITLE}</p>
+          </>
+        }
+      >
+        <div className={workPageFormFieldStackClasses}>
+          <WorkPageFormFieldBlock label="Input (Mandatory)" required>
+            <input className={formControlInputClasses} placeholder="Placeholder" aria-required />
+          </WorkPageFormFieldBlock>
+          <WorkPageFormFieldBlock label="Input (Optional)">
+            <input className={formControlInputClasses} placeholder="Enter Text" />
+          </WorkPageFormFieldBlock>
+          <WorkPageFormFieldBlock label="Input (Big)">
+            <textarea className={[formControlTextareaClasses, 'h-20'].join(' ')} placeholder="Description..." />
+          </WorkPageFormFieldBlock>
+          <WorkPageFormFieldBlock label="Dropdown (Mandatory)" required>
+            <select className={[formControlSelectClasses, 'w-full'].join(' ')} aria-required>
+              <option>Choose Model</option>
+            </select>
+          </WorkPageFormFieldBlock>
+          <WorkPageFormFieldBlock label="Dropdown (Optional)">
+            <select className={[formControlSelectClasses, 'w-full'].join(' ')}>
+              <option>Choose Model</option>
+            </select>
+          </WorkPageFormFieldBlock>
+          <Type2ParameterTagsField />
         </div>
-      )}
-    </>
+      </ActivityStepContainerBlock>
+
+      <ActivityStepContainerBlock
+        header={
+          <>
+            <h2 className="sr-only">File settings</h2>
+            <p className={workPageSectionContainerTitleClasses}>{WORK_PAGE_FILE_SETTINGS_TITLE}</p>
+          </>
+        }
+        footer={<WorkPageActivityFooterToolbarBlock left={toolbarLeft} right={toolbarRight} />}
+      >
+        <WorkPageFileUploadDropzoneBlock
+          selectedFileName={uploadFileName}
+          onFileChange={(f) => setUploadFileName(f?.name ?? '')}
+        >
+          <WorkPageFormFieldBlock label="Text Prompt">
+            <textarea className={[formControlTextareaClasses, 'h-24'].join(' ')} placeholder="Description..." />
+          </WorkPageFormFieldBlock>
+        </WorkPageFileUploadDropzoneBlock>
+      </ActivityStepContainerBlock>
+    </div>
   );
 }
 
@@ -182,11 +215,7 @@ export function WorkPageTemplateCanvasBlock({ variant, step1Footer, step3Footer 
   }
 
   if (variant === 'type2-parameter-only') {
-    return (
-      <div className="space-y-4">
-        <WorkPageType2ParameterOnlyBody step1Footer={step1Footer} />
-      </div>
-    );
+    return <WorkPageType2ParameterOnlyBody step1Footer={step1Footer} />;
   }
 
   if (variant === 'type2-parameter-columns') {

@@ -129,10 +129,24 @@ export const blockUnitItems: DescriptionUnitItem[] = [
     bullets: [
       '구성: 내비 링크·아이콘 버튼·브랜드 (컴포넌트 버튼/링크 토큰과 정렬)',
       'Home/Projects/Library 공통 사용',
-      '우측 아이콘 액션과 utility button 확장 지원',
+      '우측: 임시 utility 버튼(Capture screen → Description → Logout) + 아이콘 액션 — `createTemporaryTopUtilityButtons`',
+      'Settings 아이콘: 넓은 오버레이 + GlobalNavSettingsPanelBlock(LNB·검색·General/Theme/RFM 등 섹션)',
     ],
     codePath: 'src/blocks/molecules/GlobalTopNav.block.tsx',
     renderable: true,
+    usedInPrototype: true,
+  },
+  {
+    id: 'desc-rfm.globalNavSettingsPanel',
+    title: 'GNB 설정 패널 (GlobalNavSettingsPanelBlock)',
+    summary:
+      '설정 오버레이 본문 — 상단 사용자 정보, 검색으로 섹션 필터, 좌측 메뉴 클릭 시 우측에 General·Theme·RFM·데이터·로보틱스·파이프라인 알림 패널',
+    bullets: [
+      '프로토타입 폼·더미 값; i18n gnb.settings.*',
+      'GNB Settings 액션에서만 합성(단독 카탈로그 프리뷰 없음)',
+    ],
+    codePath: 'src/blocks/organisms/GlobalNavSettingsPanel.block.tsx',
+    renderable: false,
     usedInPrototype: true,
   },
   {
@@ -317,9 +331,35 @@ export const blockUnitItems: DescriptionUnitItem[] = [
     bullets: [
       'Register(WorkPageTemplateCanvas type2) 및 Synthetic Video Creation 좌측에서 공통 사용',
       '선택 파일명 표시 시 File Upload로 교체·Clear로 onFileChange(null)',
-      'Synthetic 좌열은 File Upload+파라미터+Run을 단일 workPage 카드(section)로 구성',
+      'Synthetic 좌열은 ActivityStepContainer: 스크롤 본문 + flex footer에 Run/Rerun',
     ],
     codePath: 'src/blocks/molecules/WorkPageFileUploadDropzone.block.tsx',
+    renderable: true,
+    usedInPrototype: true,
+  },
+  {
+    id: 'desc-rfm.activityStepContainer',
+    title: '액티비티 스텝 컨테이너 (ActivityStepContainerBlock)',
+    summary:
+      '헤더(타이틀) + flex-1 overflow-y-auto 본문 + 선택적 푸터 — 카드 높이를 채우며 버튼은 푸터에만 두고 sticky/absolute 없음',
+    bullets: [
+      '스타일 토큰: activityStepContainerClasses, activityStepHeaderClasses, activityStepContentClasses, activityStepFooterClasses',
+      'Collect / Generate / Register type2 / Curate 등 activity step-1 카드 공통 껍데기',
+    ],
+    codePath: 'src/blocks/molecules/ActivityStepContainer.block.tsx',
+    renderable: true,
+    usedInPrototype: true,
+  },
+  {
+    id: 'desc-rfm.workPageActivityFooterToolbar',
+    title: '워크페이지 액티비티 푸터 툴바 (WorkPageActivityFooterToolbarBlock)',
+    summary:
+      'ActivityStepContainer 푸터 안에서만 쓰는 좌·우 버튼 행 — workPageActivityFooterToolbarRowClasses (sticky 아님)',
+    bullets: [
+      'Register type2 우측(File settings) Previous/Register, Collect·Generate·Curate step-1 등',
+      '예전 WorkPageActivityStickyToolbarBlock 대체 — 위치는 항상 카드 하단 flex 푸터',
+    ],
+    codePath: 'src/blocks/molecules/WorkPageActivityFooterToolbar.block.tsx',
     renderable: true,
     usedInPrototype: true,
   },
@@ -328,7 +368,8 @@ export const blockUnitItems: DescriptionUnitItem[] = [
     title: '워크페이지 템플릿 캔버스 (WorkPageTemplateCanvasBlock)',
     summary: 'WorkPage 화면 유형(Type1~Type4 변형)을 스켈레톤 레이아웃으로 제공하는 템플릿 블록',
     bullets: [
-      '구성: desc-rfm.workPageFormField, desc-rfm.workPageFileUploadDropzone, desc-rfm.formTagInput, component.input·select·textarea 등',
+      '구성: desc-rfm.workPageFormField, desc-rfm.workPageFileUploadDropzone, desc-rfm.activityStepContainer, desc-rfm.workPageActivityFooterToolbar, desc-rfm.formTagInput, component.input·select·textarea 등',
+      'type2-parameter-only(Register): 우측 File settings 카드는 ActivityStepContainer + 푸터에 Previous·Register(desc-rfm.workPageActivityFooterToolbar)',
       '총 6개 레이아웃 변형 제공',
       '실제 업무 컨텐츠 삽입 전 구조 표준화 용도',
     ],
@@ -370,9 +411,11 @@ export const blockUnitItems: DescriptionUnitItem[] = [
   {
     id: 'desc-rfm.collectTeleoperationStep',
     title: 'Collect 텔레옵 스텝 (CollectTeleoperationStepBlock)',
-    summary: 'Collect activity 1단계(Teleoperation) — 좌: 파라미터 폼+Apply, 우: 에피소드·녹화 프로그레스·3분할 카메라 슬롯·세션 버튼',
+    summary:
+      'Collect activity 1단계(Teleoperation) — ActivityStepContainer 푸터에 WorkPageActivityFooterToolbar(좌: Apply / 우: Start…Finish+Save)',
     bullets: [
       '버튼 의미는 docs/policies/collect-teleoperation-actions.md 단일 소스',
+      '세션 제어·Save는 우측 카드 flex 푸터(스크롤 본문과 분리, sticky 없음)',
       '에피소드 진행률 바는 녹화 경과 초 / 에피소드당 최대 초(프로토 20s); Next로 채우지 않음',
       'Save는 Finish 또는 해당 에피소드 녹화 종료(최대 도달·Stop) 시 활성',
       '카메라: 좌·중·우 가로 비율(중앙 넓게 16∶9), 프로토타입은 연결 토글만',
@@ -385,13 +428,65 @@ export const blockUnitItems: DescriptionUnitItem[] = [
     id: 'desc-rfm.syntheticVideoCreationStep',
     title: 'Generate 합성 영상 스텝 (SyntheticVideoCreationStepBlock)',
     summary:
-      'Generate activity 1단계 — 좌: desc-rfm.workPageFileUploadDropzone+파라미터, Run→Rerun·스냅샷 잠금; 우: 진행률·complete·영상·Save',
+      'Generate activity 1단계 — ActivityStepContainer: 좌 푸터 Run/Rerun, 우 complete 시 푸터 Save',
     bullets: [
       'Collect step 1과 동일한 2열 그리드·높이 토큰(workPageStep1TwoColumnGridClasses, collectTeleopGridHeightClasses)',
       '워크플로 스테퍼 1단계 라벨: Synthetic Video Generation(해당 generateMode일 때)',
       'File Upload 영역은 Register type2와 동일 molecule(WorkPageFileUploadDropzoneBlock), 파라미터와 한 카드에 병합',
+      '영상 완료 후 컨트롤은 본문 흐름 레이아웃(오버레이·backdrop-blur 없음)',
     ],
     codePath: 'src/blocks/organisms/SyntheticVideoCreationStep.block.tsx',
+    renderable: true,
+    usedInPrototype: true,
+  },
+  {
+    id: 'desc-rfm.mimicAugmentationStep',
+    title: 'Generate Mimic Augmentation 스텝 (MimicAugmentationStepBlock)',
+    summary:
+      'Generate activity 1단계(mimic-augmentation) — ActivityStepContainer: 좌 푸터 Run/Rerun, 우 complete 시 푸터 Save',
+    bullets: [
+      'Synthetic Video와 동일 2열 그리드·높이 토큰(workPageStep1TwoColumnGridClasses, collectTeleopGridHeightClasses)',
+      '워크플로 스테퍼 1단계 라벨: Mimic Augmentation(generateMode=mimic-augmentation)',
+      '우측 머리글 WORK_PAGE_SIMULATION_PREVIEW_TITLE; 스크롤 본문 progress·썸네일, Save는 푸터',
+    ],
+    codePath: 'src/blocks/organisms/MimicAugmentationStep.block.tsx',
+    renderable: true,
+    usedInPrototype: true,
+  },
+  {
+    id: 'desc-rfm.idmTrajectoryStep',
+    title: 'Generate IDM trajectory 스텝 (IdmTrajectoryStepBlock)',
+    summary:
+      'Generate activity 1단계(generateMode=idm) — 좌 푸터 Run fusion, 우 푸터 Continue; 프리뷰는 본문 그라데이션 박스(absolute 레이어 없음)',
+    bullets: [
+      'Mimic/Synthetic와 동일 2열 그리드·높이 토큰',
+      '워크스페이스 Saved Datasets에서 클립 옵션 주입 가능(datasetClips)',
+      'Run fusion·Continue는 각 열 ActivityStepContainer 푸터',
+    ],
+    codePath: 'src/blocks/organisms/IdmTrajectoryStep.block.tsx',
+    renderable: true,
+    usedInPrototype: true,
+  },
+  {
+    id: 'desc-rfm.mergeDatasetsStep',
+    title: 'Curate Merge datasets 스텝 (MergeDatasetsStepBlock)',
+    summary:
+      'Curate 1단계(merge-datasets) — 상·하 두 ActivityStepContainer: 선택+preview 스크롤 / merged output 이름·설명+푸터 Continue',
+    bullets: [
+      'Data Foundry Saved Datasets와 동일 Source 칩(chipSourceActivityClasses)',
+      '워크플로 스테퍼: merge datasets / pre-processor / save datasets',
+      'merged output: 푸터에 Continue to pre-processor',
+    ],
+    codePath: 'src/blocks/organisms/MergeDatasetsStep.block.tsx',
+    renderable: true,
+    usedInPrototype: true,
+  },
+  {
+    id: 'desc-rfm.curateAnalyticsStep',
+    title: 'Curate Analytics 스텝 (CurateAnalyticsStepBlock)',
+    summary: 'Curate 1단계(analytics) — ActivityStepContainer + 푸터 Continue + 자리 표시형 패널; 후속 차트·필터 UI 연결 예정',
+    bullets: ['URL curateMode=analytics', 'Continue는 카드 flex 푸터'],
+    codePath: 'src/blocks/organisms/CurateAnalyticsStep.block.tsx',
     renderable: true,
     usedInPrototype: true,
   },
@@ -586,6 +681,7 @@ export const screenPatternUnitItems: DescriptionUnitItem[] = [
       '주요 구성: desc-rfm.listToolbar, desc-rfm.dataTable, desc-rfm.workPageShell, desc-rfm.formTagInput 등',
       '대표 경로: /projects/:projectId/workspace',
       '도메인 탭 + 활동 진입 카드 + 데이터 테이블 조합',
+      'Data Foundry / Model Institute 탭: user-role-policy — owner는 둘 다, data engineer는 Data Foundry만, model engineer는 Model Institute만(getWorkspaceTabVisibility)',
     ],
     codePath: 'src/screens/projects/ProjectWorkspace/ProjectWorkspace.screen.tsx',
     renderable: true,
@@ -609,7 +705,7 @@ export const screenPatternUnitItems: DescriptionUnitItem[] = [
     title: 'Work Page',
     summary: '각 work 활동 버튼 클릭 후 URL 전환으로 진입하는 full-size 실행 화면 패턴',
     bullets: [
-      '주요 구성: desc-rfm.workPageShell, desc-rfm.workPageTemplateCanvas, desc-rfm.collectTeleoperationStep(Collect), desc-rfm.syntheticVideoCreationStep(Generate·synthetic-video), desc-rfm.activityValidation, desc-rfm.activitySaveDataset',
+      '주요 구성: desc-rfm.workPageShell, desc-rfm.workPageTemplateCanvas, desc-rfm.collectTeleoperationStep(Collect), desc-rfm.syntheticVideoCreationStep(Generate·synthetic-video), desc-rfm.mimicAugmentationStep(Generate·mimic-augmentation), desc-rfm.idmTrajectoryStep(Generate·idm), desc-rfm.mergeDatasetsStep(Curate·merge-datasets), desc-rfm.curateAnalyticsStep(Curate·analytics), desc-rfm.activityValidation, desc-rfm.activitySaveDataset',
       '대표 경로: /projects/:projectId/workspace/:workKey',
       '공통 헤더 + 스텝바 + (액티비티별) 캔버스 구조',
     ],

@@ -6,6 +6,7 @@ import { ProjectInfoListPanelBlock } from '../../../blocks/organisms/ProjectInfo
 import { ProjectOutputSummaryPanelBlock } from '../../../blocks/organisms/ProjectOutputSummaryPanel.block';
 import { getLibraryAssetDetailView } from '../../../data-spec/mocks/libraryAssets.mock';
 import { useLanguage } from '../../../context/LanguageContext';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 import { ArrowLeftOutlined } from '../../../icons';
 import {
   createGlobalTopNavItems,
@@ -43,7 +44,7 @@ export function LibraryAssetDetailScreen({ assetKind, assetId, onNavigate }: Pro
           utilityButtons={utilityButtons}
           actions={globalTopNavActions}
         />
-        <div className="mx-auto max-w-7xl px-4 py-10">
+        <div className={[appShellInnerClass, 'py-10'].join(' ')}>
           <p className="text-sm text-slate-700">
             {wrongKind ? 'This asset exists under a different library tab.' : 'Asset not found.'}
           </p>
@@ -74,7 +75,7 @@ export function LibraryAssetDetailScreen({ assetKind, assetId, onNavigate }: Pro
         actions={globalTopNavActions}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-4">
+      <div className={[appShellInnerClass, 'py-4'].join(' ')}>
         <div className="mb-4">
           <button
             type="button"

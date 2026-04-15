@@ -23,6 +23,7 @@ import {
   type InviteDirectoryUser,
 } from '../../../data-spec/mocks/inviteDirectory.mock';
 import { projectSelectorRows } from '../../../data-spec/mocks/projectSelector.mock';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 import { useLanguage } from '../../../context/LanguageContext';
 import {
   createGlobalTopNavItems,
@@ -434,7 +435,7 @@ export function ProjectSettingsScreen({ projectId, onNavigate }: Props): JSX.Ele
           actions={globalTopNavActions}
         />
         <div className={isUxOpen ? 'pr-0 transition-[padding] duration-300 lg:pr-[440px]' : 'transition-[padding] duration-300'}>
-          <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-4 px-4 py-4 lg:grid-cols-[200px_minmax(0,1fr)]">
+          <div className={[appShellInnerClass, 'grid grid-cols-1 gap-4 py-4 lg:grid-cols-[200px_minmax(0,1fr)]'].join(' ')}>
             <div className={highlightClass('sidebar')}>
               <ProjectWorkspaceSidebarBlock
                 projectTitle={activeProjectTitle}

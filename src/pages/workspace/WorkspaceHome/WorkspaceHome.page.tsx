@@ -2,13 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { useLanguage } from '../../../context/LanguageContext';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 
 export function WorkspaceHomePage(): JSX.Element {
   const { t } = useLanguage();
 
   return (
-    <main className="min-h-screen bg-slate-100 px-6 py-8">
-      <div className="mx-auto w-full max-w-5xl">
+    <main className="min-h-screen bg-slate-100 py-8">
+      <div className={appShellInnerClass}>
         <header className="mb-5">
           <h1 className="text-2xl font-semibold text-slate-900">{t('workspaceHome.title')}</h1>
           <p className="mt-1 text-sm text-slate-600">{t('workspaceHome.subtitle')}</p>

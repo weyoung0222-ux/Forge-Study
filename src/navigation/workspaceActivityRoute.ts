@@ -1,18 +1,28 @@
 import type { ActivityDraftActivityKey } from '../data-spec/mocks/activityDraftHistory.mock';
 
+export type WorkspaceActivityHrefOptions = {
+  generateMode?: string;
+  /** Curate sub-flow (merge-datasets | analytics); must match Load draft restore. */
+  curateMode?: string;
+};
+
 /**
- * Workspace activity work page URL. Generator keeps sub-flow via `generateMode` (must match Load draft restore).
+ * Workspace activity work page URL. Generator/Curator keep sub-flow query keys (must match Load draft restore).
  * @see docs/policies/activity-draft-restore.md
  */
 export function hrefWorkspaceActivity(
   projectId: string,
   activity: ActivityDraftActivityKey,
-  options?: { generateMode?: string },
+  options?: WorkspaceActivityHrefOptions,
 ): string {
   const base = `/projects/${projectId}/workspace/${activity}`;
-  const mode = options?.generateMode?.trim();
-  if (activity === 'generator' && mode) {
-    return `${base}?${new URLSearchParams({ generateMode: mode }).toString()}`;
+  const gen = options?.generateMode?.trim();
+  if (activity === 'generator' && gen) {
+    return `${base}?${new URLSearchParams({ generateMode: gen }).toString()}`;
+  }
+  const cur = options?.curateMode?.trim();
+  if (activity === 'curator' && cur) {
+    return `${base}?${new URLSearchParams({ curateMode: cur }).toString()}`;
   }
   return base;
 }

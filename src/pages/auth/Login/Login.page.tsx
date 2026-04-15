@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { OverlayDialogBlock } from '../../../blocks/molecules/OverlayDialog.block';
 import { formControlInputH10Classes } from '../../../blocks/styles/formFieldClasses';
 import { useLanguage } from '../../../context/LanguageContext';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 
 export function LoginPage(): JSX.Element {
   const navigate = useNavigate();
@@ -20,7 +21,8 @@ export function LoginPage(): JSX.Element {
   };
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-10">
+    <main className="min-h-screen bg-slate-100 py-10">
+      <div className={appShellInnerClass}>
       <div className="mx-auto w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="mb-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('login.brand')}</p>
@@ -67,6 +69,7 @@ export function LoginPage(): JSX.Element {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <OverlayDialogBlock title={t('login.roleModalTitle')} isOpen={isRoleModalOpen} onClose={() => setIsRoleModalOpen(false)}>

@@ -52,7 +52,7 @@ export const projectWorkspaceUxDescription: { title: string; summary: string; it
       title: 'Saved Datasets / Saved Models',
       description: '도메인 탭에 따라 다른 산출물 테이블 — Data Foundry는 데이터셋, Model Institute는 모델',
       bullets: [
-        'Data Foundry: Saved Datasets — DF activity 산출 행만',
+        'Data Foundry: Saved Datasets — DF activity 산출 행만; Source 우측에 data 종류 컬럼(예: Dataset, Video, Episode, Trajectory 등)',
         'Model Institute: Saved Models — Trainer/Evaluator 산출 행만',
         'Publish 액션·페이지네이션·확인 모달 동일 패턴',
       ],

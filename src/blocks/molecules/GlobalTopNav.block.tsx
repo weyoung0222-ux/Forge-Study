@@ -1,4 +1,6 @@
 import React from 'react';
+
+import { appShellInnerClass } from '../../styles/appLayoutClasses';
 import { OverlayDialogBlock } from './OverlayDialog.block';
 
 export type TopNavItem = {
@@ -16,6 +18,10 @@ export type TopNavAction = {
   hasPopup?: boolean;
   popupContent?: React.ReactNode;
   surface?: 'overlay' | 'popover';
+  /** 오버레이 다이얼로그(`surface`가 popover가 아닐 때) 패널 `max-w-*` — 기본 `max-w-md`. */
+  overlayPanelMaxWidthClass?: string;
+  /** 오버레이 다이얼로그 패널에 추가 클래스(높이·패딩·flex 등). */
+  overlayPanelClassName?: string;
 };
 
 export type TopNavUtilityButton = {
@@ -72,7 +78,7 @@ export function GlobalTopNavBlock({
   return (
     <>
       <header className="sticky top-0 z-50 h-14 border-b border-slate-200 bg-white">
-        <div className="flex h-full w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className={[appShellInnerClass, 'flex h-full items-center justify-between'].join(' ')}>
           <div className="flex items-center gap-10">
             <button type="button" onClick={onBrandClick} className="flex items-center gap-2 bg-transparent">
               {brandIcon ? <span className="text-slate-900">{brandIcon}</span> : null}
@@ -154,6 +160,16 @@ export function GlobalTopNavBlock({
         title={openedOverlayAction?.label ?? 'Menu'}
         isOpen={Boolean(openedOverlayAction)}
         onClose={() => setOpenActionKey(null)}
+        panelMaxWidthClass={openedOverlayAction?.overlayPanelMaxWidthClass}
+        panelClassName={[
+          openedOverlayAction?.overlayPanelMaxWidthClass &&
+          openedOverlayAction.overlayPanelMaxWidthClass !== 'max-w-md'
+            ? 'flex max-h-[min(640px,88vh)] min-h-0 flex-col overflow-hidden'
+            : '',
+          openedOverlayAction?.overlayPanelClassName ?? '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
       >
         {openedOverlayAction?.popupContent ?? (
           <div className="text-sm text-slate-600">

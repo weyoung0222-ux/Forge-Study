@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { appShellInnerClass } from '../../styles/appLayoutClasses';
 import { ArrowLeftOutlined, CheckOutlined } from '../../icons';
 import { type UiTitleCaseLocale, uiTitleCase } from '../../utils/titleCase';
 
@@ -98,11 +99,12 @@ export function WorkPageShellBlock({
 
   const shellClassName = embedded
     ? 'relative z-0 flex max-h-[min(520px,70vh)] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm'
-    : 'fixed inset-x-0 bottom-0 top-14 z-40 flex flex-col overflow-hidden border-t border-slate-200 bg-white';
+    : 'fixed inset-x-0 bottom-0 top-14 z-40 flex min-h-0 flex-col overflow-hidden border-t border-slate-200 bg-white';
 
   return (
     <section role="dialog" aria-modal="true" aria-label={title} className={shellClassName}>
-      <header className="flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-3">
+      <header className="shrink-0 border-b border-slate-200 bg-white">
+        <div className={[appShellInnerClass, 'flex items-center justify-between py-3'].join(' ')}>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <button
@@ -136,9 +138,11 @@ export function WorkPageShellBlock({
             {uiTitleCase(historyButtonLabel, locale)}
           </button>
         </div>
+        </div>
       </header>
 
-      <div className="shrink-0 border-b border-slate-200 px-4 py-2 text-slate-600">
+      <div className="shrink-0 border-b border-slate-200 bg-white text-slate-600">
+        <div className={[appShellInnerClass, 'py-2'].join(' ')}>
         <nav className="inline-flex flex-wrap items-center gap-x-2 gap-y-1" aria-label="Workflow steps">
           {steps.map((step, index) => {
             const label = stepLabels[step - 1];
@@ -184,18 +188,24 @@ export function WorkPageShellBlock({
             );
           })}
         </nav>
+        </div>
       </div>
 
-      <div
-        ref={setContentScrollRef}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain bg-slate-100 p-4"
-        style={
-          scrollInnerPx !== undefined
-            ? { ['--work-page-shell-scroll-inner-px' as string]: `${scrollInnerPx}px` }
-            : undefined
-        }
-      >
-        {children}
+      <div className="flex min-h-0 flex-1 flex-col bg-slate-100">
+        <div
+          ref={setContentScrollRef}
+          className={[
+            appShellInnerClass,
+            'flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain py-4',
+          ].join(' ')}
+          style={
+            scrollInnerPx !== undefined
+              ? { ['--work-page-shell-scroll-inner-px' as string]: `${scrollInnerPx}px` }
+              : undefined
+          }
+        >
+          {children}
+        </div>
       </div>
     </section>
   );

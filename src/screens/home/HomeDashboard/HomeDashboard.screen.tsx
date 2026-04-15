@@ -2,6 +2,7 @@ import React from 'react';
 
 import { GlobalTopNavBlock } from '../../../blocks/molecules/GlobalTopNav.block';
 import { ScreenDescriptionPanelBlock } from '../../../blocks/organisms/ScreenDescriptionPanel.block';
+import { appShellInnerClass } from '../../../styles/appLayoutClasses';
 import { useLanguage } from '../../../context/LanguageContext';
 import {
   createGlobalTopNavItems,
@@ -71,7 +72,7 @@ export function HomeDashboardScreen({ onNavigate }: Props): JSX.Element {
         />
 
         <div className={isUxOpen ? 'pr-0 transition-[padding] duration-300 lg:pr-[440px]' : 'transition-[padding] duration-300'}>
-          <div className="mx-auto w-full max-w-7xl px-6 py-8">
+          <div className={[appShellInnerClass, 'py-8'].join(' ')}>
             <header className="mb-6">
               <h1 className="text-3xl font-semibold text-slate-900">{t('home.header.greeting')}</h1>
               <p className="mt-1 text-sm text-slate-600">{t('home.header.subtitle')}</p>
